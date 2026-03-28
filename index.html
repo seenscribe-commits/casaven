@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>CasaVen</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
 a{text-decoration:none;color:inherit}
 .page{display:none}
 .page.active{display:block}
-img{max-width:100%}
 
-/* ── NAV ── */
-nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid #eee;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+nav{position:sticky;top:0;z-index:500;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid #eee;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{font-size:20px;font-weight:700;letter-spacing:-0.5px;cursor:pointer;flex-shrink:0}
 .logo span{color:#1D9E75}
 .nav-links{display:flex;gap:22px}
@@ -24,55 +22,44 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop
 .lang-toggle{display:flex;gap:2px;background:#f0f0ee;border-radius:20px;padding:3px}
 .lang-btn{border:none;background:none;border-radius:17px;padding:4px 12px;font-size:13px;cursor:pointer;color:#777;font-weight:500;transition:all .2s}
 .lang-btn.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,.1)}
-.btn-ghost{background:none;border:1px solid #ddd;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;font-weight:500;transition:all .2s;white-space:nowrap}
-.btn-ghost:hover{border-color:#999}
+.btn-ghost{background:none;border:1px solid #ddd;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap}
 .btn-dark{background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap}
-.btn-dark:hover{opacity:.82}
 .nav-menu-btn{display:none;background:none;border:1px solid #eee;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
-.mobile-menu{display:none;position:fixed;inset:0;top:60px;background:#fff;z-index:199;padding:20px 24px;flex-direction:column;gap:0;border-top:1px solid #eee}
+.mobile-menu{display:none;position:fixed;inset:0;top:60px;background:#fff;z-index:490;padding:20px 24px;flex-direction:column;border-top:1px solid #eee;overflow-y:auto}
 .mobile-menu.open{display:flex}
 .mobile-menu a{font-size:16px;color:#333;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer}
 .mobile-menu .mm-bottom{margin-top:20px;display:flex;flex-direction:column;gap:10px}
 
-/* ── HERO ── */
 .hero{padding:56px 24px 48px;max-width:1160px;margin:0 auto}
 .hero-badge{display:inline-flex;align-items:center;gap:7px;background:#e6f7f2;border-radius:20px;padding:5px 14px;margin-bottom:18px}
 .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:#1D9E75;flex-shrink:0}
 .hero-badge span{font-size:13px;color:#0F6E56;font-weight:500}
-.hero h1{font-size:clamp(32px,5vw,52px);font-weight:700;line-height:1.1;letter-spacing:-1px;margin-bottom:16px;max-width:640px}
+.hero h1{font-size:clamp(30px,5vw,52px);font-weight:700;line-height:1.1;letter-spacing:-1px;margin-bottom:16px;max-width:640px}
 .hero p{font-size:clamp(15px,2vw,18px);color:#666;line-height:1.65;max-width:500px;margin-bottom:36px}
-
-/* ── SEARCH BOX ── */
 .search-box{background:#fff;border:1px solid #e8e8e8;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.07)}
 .search-tabs{display:flex;border-bottom:1px solid #f0f0ee;padding:0 4px}
 .stab{background:none;border:none;border-bottom:2px solid transparent;padding:12px 16px;font-size:14px;cursor:pointer;color:#888;font-weight:500;transition:all .2s;margin-bottom:-1px}
 .stab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
 .search-row{display:flex;gap:8px;padding:12px;flex-wrap:wrap}
-.sf{flex:1;min-width:140px;position:relative}
-.sf.wide{flex:2;min-width:200px}
+.sf{flex:1;min-width:130px;position:relative}
+.sf.wide{flex:2;min-width:180px}
 .sf input,.sf select{width:100%;border:1px solid #eee;border-radius:9px;padding:10px 12px;font-size:14px;outline:none;background:#fafafa;color:#1a1a1a;transition:border-color .2s;appearance:none;font-family:inherit}
 .sf input:focus,.sf select:focus{border-color:#1D9E75;background:#fff}
 .sf.has-ico input{padding-left:32px}
 .sf .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
-.btn-search{background:#1D9E75;color:#fff;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s;width:100%;flex-basis:100%}
+.btn-search{background:#1D9E75;color:#fff;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s}
 .btn-search:hover{background:#178a65}
-
-/* ── STATS ── */
-.stats{background:#fff;border-top:1px solid #f0f0ee;border-bottom:1px solid #f0f0ee;padding:24px 24px}
-.stats-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stats{background:#fff;border-top:1px solid #f0f0ee;border-bottom:1px solid #f0f0ee;padding:24px}
+.stats-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 .stat{text-align:center;padding:4px 12px;border-right:1px solid #eee}
 .stat:last-child{border-right:none}
 .stat-n{font-size:clamp(20px,3vw,28px);font-weight:700;letter-spacing:-0.5px}
 .stat-l{font-size:12px;color:#888;margin-top:2px}
-
-/* ── SECTIONS ── */
 .section{padding:48px 24px;max-width:1160px;margin:0 auto}
 .sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px;gap:12px}
 .sec-head h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-0.5px}
 .sec-head a{font-size:14px;color:#1D9E75;font-weight:500;cursor:pointer;white-space:nowrap}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
-
-/* ── PROPERTY CARD ── */
 .prop-card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid #eee;transition:transform .2s,box-shadow .2s;cursor:pointer}
 .prop-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.09)}
 .card-img{height:180px;position:relative;display:flex;align-items:flex-end;padding:12px}
@@ -88,8 +75,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop
 .card-price{font-size:20px;font-weight:700;letter-spacing:-0.5px;margin-bottom:12px}
 .card-price small{font-size:13px;font-weight:400;color:#888}
 .card-meta{display:flex;gap:12px;font-size:13px;color:#888;border-top:1px solid #f5f5f5;padding-top:11px;flex-wrap:wrap}
-
-/* ── HOW IT WORKS ── */
 .how-section{background:#fff;padding:48px 24px}
 .how-inner{max-width:1160px;margin:0 auto}
 .how-inner h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
@@ -98,38 +83,60 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop
 .step-icon{width:44px;height:44px;border-radius:12px;background:#f0faf6;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
 .step h3{font-size:15px;font-weight:600;margin-bottom:6px}
 .step p{font-size:14px;color:#777;line-height:1.6}
-
-/* ── CITIES ── */
 .cities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
 .city-card{border-radius:12px;padding:20px 16px;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden;min-height:100px;display:flex;flex-direction:column;justify-content:flex-end}
 .city-card:hover{transform:translateY(-3px)}
 .city-name{font-weight:700;font-size:15px;color:#fff;position:relative;z-index:1}
 .city-count{font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;position:relative;z-index:1}
 .city-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,.1))}
-
-/* ── CTA ── */
 .cta-section{padding:48px 24px;max-width:1160px;margin:0 auto}
 .cta-box{background:#1a1a1a;border-radius:18px;padding:40px 36px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
 .cta-box h2{font-size:clamp(20px,3vw,26px);font-weight:700;color:#fff;letter-spacing:-0.5px;margin-bottom:8px}
 .cta-box p{font-size:15px;color:rgba(255,255,255,.6);max-width:420px;line-height:1.6}
 .btn-white{background:#fff;color:#1a1a1a;border:none;border-radius:9px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
-.btn-white:hover{opacity:.9}
-
-/* ── FOOTER ── */
 footer{border-top:1px solid #eee;padding:28px 24px;background:#fff}
 .foot-inner{max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .foot-links{display:flex;gap:18px;flex-wrap:wrap}
 .foot-links a{font-size:13px;color:#888;cursor:pointer}
-.foot-links a:hover{color:#1a1a1a}
 .foot-copy{font-size:13px;color:#bbb}
 
-/* ── DETAIL PAGE ── */
+/* MAP PAGE */
+#pg-map{height:calc(100vh - 60px);display:none;flex-direction:column}
+#pg-map.active{display:flex}
+.map-topbar{background:#fff;border-bottom:1px solid #eee;padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;z-index:10}
+.map-topbar .sf{min-width:110px;flex:1}
+.map-topbar .sf input,.map-topbar .sf select{padding:8px 10px;font-size:13px}
+.map-topbar .sf.has-ico input{padding-left:28px}
+.map-topbar .sf .ico{font-size:13px}
+.map-view-toggle{display:flex;gap:3px;background:#f0f0ee;border-radius:8px;padding:3px;flex-shrink:0}
+.mvt-btn{border:none;background:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;color:#777;font-weight:500;transition:all .2s;white-space:nowrap}
+.mvt-btn.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.map-body{display:flex;flex:1;overflow:hidden;position:relative}
+.map-list{width:360px;flex-shrink:0;overflow-y:auto;border-right:1px solid #eee;background:#f8f8f6;position:relative;z-index:2}
+.map-list-header{padding:12px 14px 8px;font-size:13px;color:#888;font-weight:500;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:3}
+.map-card{background:#fff;border-radius:12px;margin:10px;border:1.5px solid transparent;cursor:pointer;overflow:hidden;transition:all .2s}
+.map-card:hover{border-color:#ddd;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.map-card.active{border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+.map-card-img{width:110px;min-height:95px;flex-shrink:0}
+.map-card-body{padding:11px 12px;flex:1;min-width:0}
+.map-card-title{font-weight:600;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-card-loc{font-size:12px;color:#888;margin-bottom:6px}
+.map-card-price{font-size:17px;font-weight:700;margin-bottom:6px}
+.map-card-price small{font-size:12px;font-weight:400;color:#888}
+.map-card-meta{display:flex;gap:8px;font-size:12px;color:#888}
+#map-el{flex:1;z-index:1}
+.no-results{padding:32px 16px;text-align:center;color:#aaa;font-size:14px}
+.map-pin{background:#1D9E75;color:#fff;border:2px solid #fff;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;transition:all .2s;display:inline-block}
+.map-pin.rent{background:#378ADD}
+.map-pin.active-pin{background:#1a1a1a !important;transform:scale(1.1)}
+.mobile-map-toggle{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:400;background:#1a1a1a;color:#fff;border:none;border-radius:24px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap}
+
+/* DETAIL */
 .detail-wrap{max-width:1160px;margin:0 auto;padding:28px 24px 0}
 .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#555;cursor:pointer;margin-bottom:18px}
-.back-btn:hover{color:#1a1a1a}
 .detail-gallery{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:8px;border-radius:14px;overflow:hidden;height:360px;margin-bottom:28px}
 .gal-main{grid-row:1/3}
-.gal-thumb:last-child{position:relative}
+.gal-t2{position:relative}
 .gal-count{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:500}
 .detail-body{max-width:1160px;margin:0 auto;padding:0 24px 72px;display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start}
 .detail-title{font-size:clamp(20px,3vw,28px);font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
@@ -148,24 +155,21 @@ footer{border-top:1px solid #eee;padding:28px 24px;background:#fff}
 .agent-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:22px;margin-bottom:14px}
 .agent-avatar{width:48px;height:48px;border-radius:50%;background:#1D9E75;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;margin-bottom:12px}
 .agent-name{font-size:15px;font-weight:700;margin-bottom:2px}
-.agent-role{font-size:13px;color:#888;margin-bottom:14px}
+.agent-role-lbl{font-size:13px;color:#888;margin-bottom:14px}
 .contact-btn{width:100%;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;transition:all .2s}
 .contact-btn.primary{background:#1D9E75;color:#fff}
-.contact-btn.primary:hover{background:#178a65}
 .contact-btn.secondary{background:#f5f5f5;color:#1a1a1a}
-.contact-btn.secondary:hover{background:#eee}
 .contact-btn.wa{background:#25D366;color:#fff}
-.contact-btn.wa:hover{background:#20bd5a}
-.map-card{background:#fff;border:1px solid #eee;border-radius:14px;overflow:hidden}
-.map-ph{height:160px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.map-ph p{font-size:13px;color:#555;font-weight:500}
-.map-addr{padding:12px 14px;font-size:13px;color:#888;border-top:1px solid #f0f0ee}
+.map-mini{background:#fff;border:1px solid #eee;border-radius:14px;overflow:hidden}
+.map-mini-ph{height:160px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.map-mini-ph p{font-size:13px;color:#555;font-weight:500}
+.map-mini-addr{padding:12px 14px;font-size:13px;color:#888;border-top:1px solid #f0f0ee}
 .extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .extra-item{background:#f8f8f6;border-radius:9px;padding:11px 13px}
 .extra-lbl{font-size:11px;color:#aaa;margin-bottom:2px}
 .extra-val{font-size:14px;font-weight:600}
 
-/* ── POST FORM ── */
+/* POST */
 .post-page{max-width:800px;margin:0 auto;padding:36px 24px 72px}
 .post-header{margin-bottom:28px}
 .post-header h1{font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
@@ -184,11 +188,10 @@ footer{border-top:1px solid #eee;padding:28px 24px;background:#fff}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:#1D9E75;background:#fff}
 .field textarea{resize:vertical;min-height:90px}
 .field .hint{font-size:12px;color:#aaa;margin-top:2px}
-.amenities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px}
+.amenities-grid-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px}
 .amenity{display:flex;align-items:center;gap:9px;border:1px solid #eee;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;user-select:none}
 .amenity:hover{border-color:#1D9E75;background:#f0faf6}
 .amenity.on{border-color:#1D9E75;background:#e6f7f2}
-.amenity .am-ico2{font-size:17px;flex-shrink:0}
 .amenity .lbl{font-size:13px;font-weight:500;color:#444;line-height:1.3;flex:1}
 .amenity.on .lbl{color:#0F6E56}
 .amenity .chk{width:17px;height:17px;border-radius:50%;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;transition:all .2s}
@@ -203,79 +206,62 @@ footer{border-top:1px solid #eee;padding:28px 24px;background:#fff}
 .submit-row{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;flex-wrap:wrap}
 .btn-cancel{background:none;border:1px solid #ddd;border-radius:9px;padding:11px 24px;font-size:14px;cursor:pointer;font-weight:500;color:#555}
 .btn-submit{background:#1D9E75;color:#fff;border:none;border-radius:9px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer}
-.btn-submit:hover{background:#178a65}
 
-/* ══════════ RESPONSIVE BREAKPOINTS ══════════ */
-
-/* Tablet: ≤ 900px */
 @media(max-width:900px){
-.nav-links{display:none}
-.btn-ghost{display:none}
-.nav-menu-btn{display:block}
-.detail-body{grid-template-columns:1fr}
-.detail-sidebar{position:static}
-.detail-gallery{height:280px}
-.field-row.three{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}.btn-ghost{display:none}.nav-menu-btn{display:block}
+  .detail-body{grid-template-columns:1fr}.detail-sidebar{position:static}
+  .detail-gallery{height:280px}.field-row.three{grid-template-columns:1fr 1fr}
+  .map-list{width:300px}
 }
-
-/* Large phone: ≤ 640px */
+@media(max-width:700px){
+  .map-list{display:none;width:100%;border-right:none}
+  .map-list.show-mob{display:block}
+  #map-el.hide-mob{display:none}
+  .mobile-map-toggle{display:block}
+}
 @media(max-width:640px){
-nav{padding:0 16px;height:56px}
-.mobile-menu{top:56px}
-.hero{padding:36px 16px 32px}
-.search-row{flex-direction:column}
-.sf,.sf.wide{flex:none;width:100%;min-width:0}
-.btn-search{flex-basis:auto}
-.stats-inner{grid-template-columns:repeat(2,1fr)}
-.stat{border-right:none;border-bottom:1px solid #eee;padding:10px 8px}
-.stat:nth-child(odd){border-right:1px solid #eee}
-.stat:nth-last-child(-n+2){border-bottom:none}
-.section{padding:32px 16px}
-.cards-grid{grid-template-columns:1fr}
-.how-section{padding:32px 16px}
-.steps{grid-template-columns:1fr 1fr}
-.cities-grid{grid-template-columns:repeat(2,1fr)}
-.cta-section{padding:32px 16px}
-.cta-box{padding:28px 24px;flex-direction:column;align-items:flex-start}
-.btn-white{width:100%;text-align:center}
-footer{padding:24px 16px}
-.foot-inner{flex-direction:column;align-items:flex-start;gap:14px}
-.detail-wrap{padding:20px 16px 0}
-.detail-gallery{grid-template-columns:1fr;grid-template-rows:1fr;height:220px}
-.gal-thumb{display:none}
-.detail-body{padding:0 16px 56px}
-.detail-specs{gap:10px}
-.spec{min-width:50px}
-.amenities-list{grid-template-columns:1fr 1fr}
-.post-page{padding:24px 16px 56px}
-.field-row{grid-template-columns:1fr}
-.field-row.three{grid-template-columns:1fr}
-.submit-row{flex-direction:column}
-.btn-cancel,.btn-submit{width:100%;text-align:center}
-.extras-grid{grid-template-columns:1fr}
+  nav{padding:0 16px;height:56px}.mobile-menu{top:56px}
+  .hero{padding:36px 16px 32px}
+  .search-row{flex-direction:column}
+  .sf,.sf.wide{flex:none;width:100%;min-width:0}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat{border-right:none;border-bottom:1px solid #eee;padding:10px 8px}
+  .stat:nth-child(odd){border-right:1px solid #eee}
+  .stat:nth-last-child(-n+2){border-bottom:none}
+  .section{padding:32px 16px}.how-section{padding:32px 16px}
+  .steps{grid-template-columns:1fr 1fr}
+  .cities-grid{grid-template-columns:repeat(2,1fr)}
+  .cta-section{padding:32px 16px}
+  .cta-box{padding:28px 20px;flex-direction:column;align-items:flex-start}
+  .btn-white{width:100%;text-align:center}
+  footer{padding:24px 16px}
+  .foot-inner{flex-direction:column;align-items:flex-start;gap:14px}
+  .cards-grid{grid-template-columns:1fr}
+  .detail-wrap{padding:20px 16px 0}
+  .detail-gallery{grid-template-columns:1fr;grid-template-rows:1fr;height:220px}
+  .gal-t1,.gal-t2{display:none}
+  .detail-body{padding:0 16px 56px}
+  .amenities-list{grid-template-columns:1fr 1fr}
+  .post-page{padding:24px 16px 56px}
+  .field-row,.field-row.three{grid-template-columns:1fr}
+  .submit-row{flex-direction:column}
+  .btn-cancel,.btn-submit{width:100%;text-align:center}
+  .extras-grid{grid-template-columns:1fr}
 }
-
-/* Small phone: ≤ 380px */
 @media(max-width:380px){
-.hero h1{font-size:26px}
-.steps{grid-template-columns:1fr}
-.cities-grid{grid-template-columns:1fr}
-.amenities-grid{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:26px}.steps{grid-template-columns:1fr}.cities-grid{grid-template-columns:1fr}
 }
 </style>
-
 </head>
 <body>
-
-<!-- ═══ NAV ═══ -->
 
 <nav>
   <div style="display:flex;align-items:center;gap:32px">
     <div class="logo" onclick="goTo('home')">casa<span>ven</span></div>
     <div class="nav-links">
-      <a id="nav-buy" onclick="goTo('home')">Comprar</a>
-      <a id="nav-rent" onclick="goTo('home')">Alquilar</a>
-      <a id="nav-agents">Agentes</a>
+      <a id="nav-buy" onclick="goTo('map')">Comprar</a>
+      <a id="nav-rent" onclick="goTo('map')">Alquilar</a>
+      <a id="nav-map" onclick="goTo('map')">Mapa</a>
       <a id="nav-list" onclick="goTo('post')">Publicar propiedad</a>
     </div>
   </div>
@@ -286,25 +272,22 @@ footer{padding:24px 16px}
     </div>
     <button class="btn-ghost" id="btn-signin">Iniciar sesión</button>
     <button class="btn-dark" id="btn-post" onclick="goTo('post')">Publicar anuncio</button>
-    <button class="nav-menu-btn" id="nav-menu-btn">☰</button>
+    <button class="nav-menu-btn" id="nav-menu-btn">&#9776;</button>
   </div>
 </nav>
 
-<!-- Mobile Menu -->
-
 <div class="mobile-menu" id="mobile-menu">
-  <a id="mm-buy" onclick="goTo('home');closeMM()">Comprar</a>
-  <a id="mm-rent" onclick="goTo('home');closeMM()">Alquilar</a>
-  <a id="mm-agents" onclick="closeMM()">Agentes</a>
+  <a id="mm-buy" onclick="goTo('map');closeMM()">Comprar</a>
+  <a id="mm-rent" onclick="goTo('map');closeMM()">Alquilar</a>
+  <a id="mm-map" onclick="goTo('map');closeMM()">Mapa</a>
   <a id="mm-list" onclick="goTo('post');closeMM()">Publicar propiedad</a>
   <div class="mm-bottom">
-    <button class="btn-ghost" style="width:100%;text-align:center;padding:11px" id="mm-signin" onclick="closeMM()">Iniciar sesión</button>
-    <button class="btn-dark" style="width:100%;text-align:center;padding:11px" id="mm-post" onclick="goTo('post');closeMM()">Publicar anuncio</button>
+    <button class="btn-ghost" style="width:100%;padding:11px" id="mm-signin" onclick="closeMM()">Iniciar sesión</button>
+    <button class="btn-dark" style="width:100%;padding:11px" id="mm-post" onclick="goTo('post');closeMM()">Publicar anuncio</button>
   </div>
 </div>
 
-<!-- ═══ HOME ═══ -->
-
+<!-- HOME -->
 <div class="page active" id="pg-home">
 <div style="background:#fff">
 <div class="hero">
@@ -318,11 +301,11 @@ footer{padding:24px 16px}
       <button class="stab" id="tab-sell">Vender</button>
     </div>
     <div class="search-row">
-      <div class="sf wide has-ico"><span class="ico">📍</span><input id="inp-loc" type="text" placeholder="Ciudad, zona o dirección…"></div>
+      <div class="sf wide has-ico"><span class="ico">&#128205;</span><input id="inp-loc" type="text" placeholder="Ciudad, zona o dirección…"></div>
       <div class="sf"><select id="sel-type"><option id="opt-type">Todos los tipos</option><option id="opt-apt">Apartamento</option><option id="opt-house">Casa</option><option id="opt-studio">Estudio</option><option id="opt-pent">Penthouse</option></select></div>
       <div class="sf"><select id="sel-beds"><option id="opt-beds">Habitaciones</option><option>1+</option><option>2+</option><option>3+</option><option>4+</option></select></div>
-      <div class="sf"><select id="sel-price"><option id="opt-price">Cualquier precio</option><option id="opt-p1">Menos de $50k</option><option id="opt-p2">$50k – $150k</option><option id="opt-p3">$150k – $300k</option><option id="opt-p4">$300k+</option></select></div>
-      <button class="btn-search" id="btn-search">Buscar</button>
+      <div class="sf"><select id="sel-price"><option id="opt-price">Cualquier precio</option><option id="opt-p1">Menos de $50k</option><option id="opt-p2">$50k-$150k</option><option id="opt-p3">$150k-$300k</option><option id="opt-p4">$300k+</option></select></div>
+      <button class="btn-search" id="btn-search-home" onclick="goTo('map')">Buscar</button>
     </div>
   </div>
 </div>
@@ -338,19 +321,19 @@ footer{padding:24px 16px}
 </div>
 
 <div class="section">
-  <div class="sec-head"><h2 id="sec-feat">Propiedades destacadas</h2><a id="lnk-all">Ver todas →</a></div>
+  <div class="sec-head"><h2 id="sec-feat">Propiedades destacadas</h2><a id="lnk-all" onclick="goTo('map')">Ver todas &rarr;</a></div>
   <div class="cards-grid" id="cards-container"></div>
 </div>
 
 <div class="how-section">
   <div class="how-inner">
-    <h2 id="how-title">¿Cómo funciona?</h2>
+    <h2 id="how-title">Como funciona</h2>
     <p class="sub" id="how-sub">Pasos simples para encontrar o publicar tu propiedad</p>
     <div class="steps">
-      <div class="step"><div class="step-icon">🔍</div><h3 id="s1">Busca y filtra</h3><p id="s1d">Explora miles de anuncios verificados por ciudad, precio, tipo y tamaño.</p></div>
-      <div class="step"><div class="step-icon">📅</div><h3 id="s2">Agenda una visita</h3><p id="s2d">Reserva una visita directamente con el agente o propietario en segundos.</p></div>
-      <div class="step"><div class="step-icon">⚡</div><h3 id="s3">Proceso rápido y seguro</h3><p id="s3d">Todos los anuncios son verificados. Comunícate y cierra con confianza.</p></div>
-      <div class="step"><div class="step-icon">🏠</div><h3 id="s4">Mudarse o cerrar trato</h3><p id="s4d">Finaliza tu alquiler o compra con apoyo completo de un agente local.</p></div>
+      <div class="step"><div class="step-icon">&#128269;</div><h3 id="s1">Busca y filtra</h3><p id="s1d">Explora miles de anuncios verificados por ciudad, precio, tipo y tamaño.</p></div>
+      <div class="step"><div class="step-icon">&#128197;</div><h3 id="s2">Agenda una visita</h3><p id="s2d">Reserva una visita directamente con el agente o propietario en segundos.</p></div>
+      <div class="step"><div class="step-icon">&#9889;</div><h3 id="s3">Proceso rapido y seguro</h3><p id="s3d">Todos los anuncios son verificados. Comunícate y cierra con confianza.</p></div>
+      <div class="step"><div class="step-icon">&#127968;</div><h3 id="s4">Mudarse o cerrar trato</h3><p id="s4d">Finaliza tu alquiler o compra con apoyo completo de un agente local.</p></div>
     </div>
   </div>
 </div>
@@ -358,47 +341,66 @@ footer{padding:24px 16px}
 <div class="section">
   <div class="sec-head"><h2 id="sec-cities">Explorar por ciudad</h2></div>
   <div class="cities-grid">
-    <div class="city-card" style="background:#1D9E75"><div class="city-overlay"></div><div class="city-name">Caracas</div><div class="city-count">1,840 <span class="city-lbl">anuncios</span></div></div>
-    <div class="city-card" style="background:#378ADD"><div class="city-overlay"></div><div class="city-name">Valencia</div><div class="city-count">620 <span class="city-lbl">anuncios</span></div></div>
-    <div class="city-card" style="background:#7b4fa6"><div class="city-overlay"></div><div class="city-name">Maracaibo</div><div class="city-count">510 <span class="city-lbl">anuncios</span></div></div>
-    <div class="city-card" style="background:#D85A30"><div class="city-overlay"></div><div class="city-name">Barquisimeto</div><div class="city-count">370 <span class="city-lbl">anuncios</span></div></div>
-    <div class="city-card" style="background:#e5a000"><div class="city-overlay"></div><div class="city-name">Maracay</div><div class="city-count">290 <span class="city-lbl">anuncios</span></div></div>
-    <div class="city-card" style="background:#555"><div class="city-overlay"></div><div class="city-name" id="city-more">+ Más ciudades</div><div class="city-count" id="city-more-sub">18 en total</div></div>
+    <div class="city-card" style="background:#1D9E75" onclick="goTo('map')"><div class="city-overlay"></div><div class="city-name">Caracas</div><div class="city-count">1,840 <span class="city-lbl">anuncios</span></div></div>
+    <div class="city-card" style="background:#378ADD" onclick="goTo('map')"><div class="city-overlay"></div><div class="city-name">Valencia</div><div class="city-count">620 <span class="city-lbl">anuncios</span></div></div>
+    <div class="city-card" style="background:#7b4fa6" onclick="goTo('map')"><div class="city-overlay"></div><div class="city-name">Maracaibo</div><div class="city-count">510 <span class="city-lbl">anuncios</span></div></div>
+    <div class="city-card" style="background:#D85A30" onclick="goTo('map')"><div class="city-overlay"></div><div class="city-name">Barquisimeto</div><div class="city-count">370 <span class="city-lbl">anuncios</span></div></div>
+    <div class="city-card" style="background:#e5a000" onclick="goTo('map')"><div class="city-overlay"></div><div class="city-name">Maracay</div><div class="city-count">290 <span class="city-lbl">anuncios</span></div></div>
+    <div class="city-card" style="background:#555"><div class="city-overlay"></div><div class="city-name" id="city-more">+ Mas ciudades</div><div class="city-count" id="city-more-sub">18 en total</div></div>
   </div>
 </div>
 
 <div class="cta-section">
   <div class="cta-box">
-    <div>
-      <h2 id="cta-title">Publica tu propiedad gratis</h2>
-      <p id="cta-sub">Llega a miles de compradores e inquilinos verificados en Venezuela. Sin costos iniciales ni comisiones.</p>
-    </div>
-    <button class="btn-white" id="cta-btn" onclick="goTo('post')">Empezar ahora →</button>
+    <div><h2 id="cta-title">Publica tu propiedad gratis</h2><p id="cta-sub">Llega a miles de compradores e inquilinos verificados. Sin costos iniciales.</p></div>
+    <button class="btn-white" id="cta-btn" onclick="goTo('post')">Empezar ahora &rarr;</button>
   </div>
 </div>
 
 <footer>
   <div class="foot-inner">
     <div class="logo" style="font-size:18px" onclick="goTo('home')">casa<span>ven</span></div>
-    <div class="foot-links"><a id="ft-about">Nosotros</a><a id="ft-contact">Contacto</a><a id="ft-privacy">Privacidad</a><a id="ft-terms">Términos</a></div>
-    <div class="foot-copy" id="ft-copy">© 2026 CasaVen. Todos los derechos reservados.</div>
+    <div class="foot-links"><a id="ft-about">Nosotros</a><a id="ft-contact">Contacto</a><a id="ft-privacy">Privacidad</a><a id="ft-terms">Terminos</a></div>
+    <div class="foot-copy" id="ft-copy">2026 CasaVen.</div>
   </div>
 </footer>
 </div>
 
-<!-- ═══ DETAIL ═══ -->
+<!-- MAP PAGE -->
+<div class="page" id="pg-map">
+  <div class="map-topbar">
+    <div class="sf has-ico" style="flex:2;min-width:140px"><span class="ico">&#128205;</span><input id="map-loc" type="text" placeholder="Ciudad o zona…"></div>
+    <div class="sf" style="min-width:100px"><select id="map-optype"><option value="">Todos</option><option value="sale">En venta</option><option value="rent">En alquiler</option></select></div>
+    <div class="sf" style="min-width:110px"><select id="map-type"><option value="">Todos los tipos</option><option value="apt">Apartamento</option><option value="house">Casa</option><option value="studio">Estudio</option><option value="pent">Penthouse</option></select></div>
+    <div class="sf" style="min-width:100px"><select id="map-price"><option value="">Precio</option><option value="1">-$50k</option><option value="2">$50k-$150k</option><option value="3">$150k-$300k</option><option value="4">$300k+</option></select></div>
+    <div class="sf" style="min-width:90px"><select id="map-beds"><option value="">Hab.</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
+    <div class="map-view-toggle">
+      <button class="mvt-btn active" id="mvt-list" onclick="setMapView('split')">&#9635; <span id="mvt-list-lbl">Lista</span></button>
+      <button class="mvt-btn" id="mvt-map" onclick="setMapView('full')">&#128506; <span id="mvt-map-lbl">Mapa</span></button>
+    </div>
+  </div>
+  <div class="map-body">
+    <div class="map-list" id="map-list">
+      <div class="map-list-header" id="map-count-lbl">6 propiedades</div>
+      <div id="map-cards"></div>
+    </div>
+    <div id="map-el"></div>
+  </div>
+  <button class="mobile-map-toggle" id="mob-toggle" onclick="toggleMobView()">&#128506; Ver mapa</button>
+</div>
 
+<!-- DETAIL -->
 <div class="page" id="pg-detail">
 <div class="detail-wrap">
-  <div class="back-btn" onclick="goTo('home')">← <span id="det-back">Volver a resultados</span></div>
+  <div class="back-btn" id="det-back-btn" onclick="goTo(detailFrom)">&#8592; <span id="det-back">Volver</span></div>
   <div class="detail-gallery">
     <div class="gal-main" id="det-gal-main"></div>
-    <div class="gal-thumb" style="background:linear-gradient(135deg,#b5d4f4,#378ADD)"></div>
-    <div class="gal-thumb" style="background:linear-gradient(135deg,#ffd3b6,#D85A30);position:relative"><div class="gal-count" id="det-gal-count">+4 fotos</div></div>
+    <div class="gal-t1" style="background:linear-gradient(135deg,#b5d4f4,#378ADD)"></div>
+    <div class="gal-t2" style="background:linear-gradient(135deg,#ffd3b6,#D85A30)"><div class="gal-count" id="det-gal-count">+4 fotos</div></div>
   </div>
 </div>
 <div class="detail-body">
-  <div class="detail-main">
+  <div>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap">
@@ -406,7 +408,7 @@ footer{padding:24px 16px}
           <span class="badge badge-feat" id="det-feat-badge" style="display:none">Destacado</span>
         </div>
         <div class="detail-title" id="det-title"></div>
-        <div class="detail-loc">📍 <span id="det-loc"></span></div>
+        <div class="detail-loc">&#128205; <span id="det-loc"></span></div>
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div class="detail-price" id="det-price"></div>
@@ -414,282 +416,433 @@ footer{padding:24px 16px}
       </div>
     </div>
     <div class="detail-specs">
-      <div class="spec"><span class="spec-ico">🛏</span><span class="spec-val" id="det-beds"></span><span class="spec-lbl" id="det-beds-lbl">Hab.</span></div>
-      <div class="spec"><span class="spec-ico">🚿</span><span class="spec-val" id="det-baths"></span><span class="spec-lbl" id="det-baths-lbl">Baños</span></div>
-      <div class="spec"><span class="spec-ico">📐</span><span class="spec-val" id="det-sqm"></span><span class="spec-lbl">m²</span></div>
-      <div class="spec"><span class="spec-ico">🏢</span><span class="spec-val" id="det-floor"></span><span class="spec-lbl" id="det-floor-lbl">Piso</span></div>
-      <div class="spec"><span class="spec-ico">🅿️</span><span class="spec-val" id="det-parking"></span><span class="spec-lbl" id="det-park-lbl">Estac.</span></div>
-      <div class="spec"><span class="spec-ico">🛗</span><span class="spec-val" id="det-elevator"></span><span class="spec-lbl" id="det-elev-lbl">Ascensor</span></div>
+      <div class="spec"><span class="spec-ico">&#128716;</span><span class="spec-val" id="det-beds"></span><span class="spec-lbl" id="det-beds-lbl">Hab.</span></div>
+      <div class="spec"><span class="spec-ico">&#128703;</span><span class="spec-val" id="det-baths"></span><span class="spec-lbl" id="det-baths-lbl">Baños</span></div>
+      <div class="spec"><span class="spec-ico">&#128208;</span><span class="spec-val" id="det-sqm"></span><span class="spec-lbl">m²</span></div>
+      <div class="spec"><span class="spec-ico">&#127970;</span><span class="spec-val" id="det-floor"></span><span class="spec-lbl" id="det-floor-lbl">Piso</span></div>
+      <div class="spec"><span class="spec-ico">&#127359;</span><span class="spec-val" id="det-parking"></span><span class="spec-lbl" id="det-park-lbl">Estac.</span></div>
+      <div class="spec"><span class="spec-ico">&#128663;</span><span class="spec-val" id="det-elevator"></span><span class="spec-lbl" id="det-elev-lbl">Ascensor</span></div>
     </div>
-    <div class="det-sec-title" id="det-desc-title">Descripción</div>
+    <div class="det-sec-title" id="det-desc-title">Descripcion</div>
     <div class="detail-desc" id="det-desc"></div>
-    <div class="det-sec-title" id="det-amenities-title">Comodidades</div>
+    <div class="det-sec-title" id="det-amen-title">Comodidades</div>
     <div class="amenities-list" id="det-amenities"></div>
-    <div class="det-sec-title" id="det-details-title">Detalles adicionales</div>
+    <div class="det-sec-title" id="det-det-title">Detalles adicionales</div>
     <div class="extras-grid" id="det-extra"></div>
   </div>
-
-  <!-- sidebar: on mobile renders below main -->
-
   <div class="detail-sidebar">
     <div class="agent-card">
       <div class="agent-avatar">CR</div>
-      <div class="agent-name">Carlos Rodríguez</div>
-      <div class="agent-role" id="det-agent-role">Agente verificado · CasaVen</div>
-      <button class="contact-btn wa" id="det-wa">💬 WhatsApp</button>
-      <button class="contact-btn primary" id="det-call">📞 <span id="det-call-lbl">Llamar</span></button>
-      <button class="contact-btn secondary">✉️ <span id="det-email-lbl">Enviar mensaje</span></button>
+      <div class="agent-name">Carlos Rodriguez</div>
+      <div class="agent-role-lbl" id="det-agent-role">Agente verificado · CasaVen</div>
+      <button class="contact-btn wa" id="det-wa">WhatsApp</button>
+      <button class="contact-btn primary" id="det-call">Llamar</button>
+      <button class="contact-btn secondary" id="det-email">Enviar mensaje</button>
     </div>
-    <div class="map-card">
-      <div class="map-ph"><div style="font-size:26px">🗺️</div><p id="det-map-lbl">Ver en el mapa</p></div>
-      <div class="map-addr" id="det-map-addr"></div>
+    <div class="map-mini">
+      <div class="map-mini-ph"><div style="font-size:26px">&#128506;</div><p id="det-map-lbl">Ver en el mapa</p></div>
+      <div class="map-mini-addr" id="det-map-addr"></div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- ═══ POST LISTING ═══ -->
-
+<!-- POST -->
 <div class="page" id="pg-post">
 <div class="post-page">
-  <div class="post-header">
-    <h1 id="ph-title">Publicar propiedad</h1>
-    <p id="ph-sub">Completa los datos de tu inmueble para llegar a miles de compradores e inquilinos.</p>
-  </div>
+  <div class="post-header"><h1 id="ph-title">Publicar propiedad</h1><p id="ph-sub">Completa los datos de tu inmueble.</p></div>
   <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
-
   <div class="fcard">
-    <div class="fcard-title"><div class="num">1</div><span id="fs1">Información básica</span></div>
-    <div class="field-row">
-      <div class="field"><label id="l-optype">Tipo de operación</label><select id="f-optype"><option id="o-sale">En venta</option><option id="o-rent">En alquiler</option></select></div>
-      <div class="field"><label id="l-proptype">Tipo de inmueble</label><select id="f-proptype"><option id="o-apt">Apartamento</option><option id="o-house">Casa</option><option id="o-studio">Estudio</option><option id="o-pent">Penthouse</option><option id="o-land">Terreno</option><option id="o-office">Oficina</option></select></div>
-    </div>
-    <div class="field-row full"><div class="field"><label id="l-ftitle">Título del anuncio</label><input type="text" id="f-title" placeholder="Ej: Apartamento moderno en Las Mercedes, Caracas"></div></div>
-    <div class="field-row full"><div class="field"><label id="l-desc">Descripción</label><textarea id="f-desc" placeholder="Describe las características principales del inmueble…"></textarea></div></div>
+    <div class="fcard-title"><div class="num">1</div><span id="fs1">Informacion basica</span></div>
+    <div class="field-row"><div class="field"><label id="l-optype">Tipo de operacion</label><select id="f-optype"><option id="o-sale">En venta</option><option id="o-rent">En alquiler</option></select></div><div class="field"><label id="l-proptype">Tipo de inmueble</label><select id="f-proptype"><option id="o-apt">Apartamento</option><option id="o-house">Casa</option><option id="o-studio">Estudio</option><option id="o-pent">Penthouse</option><option id="o-land">Terreno</option><option id="o-office">Oficina</option></select></div></div>
+    <div class="field-row full"><div class="field"><label id="l-ftitle">Titulo del anuncio</label><input type="text" id="f-title" placeholder="Ej: Apartamento moderno en Las Mercedes"></div></div>
+    <div class="field-row full"><div class="field"><label id="l-desc">Descripcion</label><textarea id="f-desc" placeholder="Describe las caracteristicas principales…"></textarea></div></div>
   </div>
-
   <div class="fcard">
-    <div class="fcard-title"><div class="num">2</div><span id="fs2">Ubicación</span></div>
-    <div class="field-row three">
-      <div class="field"><label id="l-state">Estado</label><select id="f-state"><option>Miranda</option><option>Carabobo</option><option>Zulia</option><option>Lara</option><option>Aragua</option><option>Bolívar</option><option>Anzoátegui</option><option>Mérida</option><option>Táchira</option><option>Distrito Capital</option></select></div>
-      <div class="field"><label id="l-city">Ciudad</label><input type="text" id="f-city" placeholder="Ej: Caracas"></div>
-      <div class="field"><label id="l-zone">Urbanización / Zona</label><input type="text" id="f-zone" placeholder="Ej: Las Mercedes"></div>
-    </div>
-    <div class="field-row full"><div class="field"><label id="l-addr">Dirección (opcional)</label><input type="text" id="f-addr" placeholder="Calle, número, edificio…"><span class="hint" id="l-addr-hint">Tu dirección exacta solo será visible para contactos verificados.</span></div></div>
+    <div class="fcard-title"><div class="num">2</div><span id="fs2">Ubicacion</span></div>
+    <div class="field-row three"><div class="field"><label id="l-state">Estado</label><select id="f-state"><option>Miranda</option><option>Carabobo</option><option>Zulia</option><option>Lara</option><option>Aragua</option><option>Distrito Capital</option></select></div><div class="field"><label id="l-city">Ciudad</label><input type="text" id="f-city" placeholder="Ej: Caracas"></div><div class="field"><label id="l-zone">Zona</label><input type="text" id="f-zone" placeholder="Ej: Las Mercedes"></div></div>
+    <div class="field-row full"><div class="field"><label id="l-addr">Direccion (opcional)</label><input type="text" id="f-addr" placeholder="Calle, numero, edificio…"><span class="hint" id="l-addr-hint">Solo visible para contactos verificados.</span></div></div>
   </div>
-
   <div class="fcard">
     <div class="fcard-title"><div class="num">3</div><span id="fs3">Detalles del inmueble</span></div>
-    <div class="field-row three">
-      <div class="field"><label id="l-beds">Habitaciones</label><select id="f-beds"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6+</option></select></div>
-      <div class="field"><label id="l-baths">Número de baños</label><select id="f-baths"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5+</option></select></div>
-      <div class="field"><label id="l-sqm">Metros cuadrados (m²)</label><input type="number" id="f-sqm" placeholder="Ej: 120" min="1"></div>
-    </div>
-    <div class="field-row three">
-      <div class="field"><label id="l-floor">Piso</label><input type="number" id="f-floor" placeholder="Ej: 4" min="0"></div>
-      <div class="field"><label id="l-elevators">Ascensores</label><select id="f-elevators"><option id="o-none">Ninguno</option><option>1</option><option>2</option><option>3+</option></select></div>
-      <div class="field"><label id="l-parking">Puestos de estacionamiento</label><select id="f-parking"><option id="o-nopark">Sin estacionamiento</option><option>1</option><option>2</option><option>3+</option></select></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label id="l-condo">Condominio mensual (USD)</label><input type="number" id="f-condo" placeholder="Ej: 80" min="0"><span class="hint" id="l-condo-hint">Deja en blanco si no aplica.</span></div>
-      <div class="field"><label id="l-year">Año de construcción</label><input type="number" id="f-year" placeholder="Ej: 2010" min="1900" max="2025"></div>
-    </div>
+    <div class="field-row three"><div class="field"><label id="l-beds">Habitaciones</label><select id="f-beds"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6+</option></select></div><div class="field"><label id="l-baths">Numero de banos</label><select id="f-baths"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5+</option></select></div><div class="field"><label id="l-sqm">Metros cuadrados</label><input type="number" id="f-sqm" placeholder="Ej: 120" min="1"></div></div>
+    <div class="field-row three"><div class="field"><label id="l-floor">Piso</label><input type="number" id="f-floor" placeholder="Ej: 4" min="0"></div><div class="field"><label id="l-elevators">Ascensores</label><select id="f-elevators"><option id="o-none">Ninguno</option><option>1</option><option>2</option><option>3+</option></select></div><div class="field"><label id="l-parking">Estacionamiento</label><select id="f-parking"><option id="o-nopark">Sin estacionamiento</option><option>1</option><option>2</option><option>3+</option></select></div></div>
+    <div class="field-row"><div class="field"><label id="l-condo">Condominio mensual (USD)</label><input type="number" id="f-condo" placeholder="Ej: 80" min="0"><span class="hint" id="l-condo-hint">Deja en blanco si no aplica.</span></div><div class="field"><label id="l-year">Ano de construccion</label><input type="number" id="f-year" placeholder="Ej: 2010"></div></div>
   </div>
-
   <div class="fcard">
-    <div class="fcard-title"><div class="num">4</div><span id="fs4">Comodidades y características</span></div>
-    <div class="amenities-grid" id="amenities-grid"></div>
+    <div class="fcard-title"><div class="num">4</div><span id="fs4">Comodidades</span></div>
+    <div class="amenities-grid-form" id="amenities-grid"></div>
   </div>
-
   <div class="fcard">
     <div class="fcard-title"><div class="num">5</div><span id="fs5">Precio</span></div>
-    <div class="price-type"><button class="ptype on" data-v="usd">USD ($)</button><button class="ptype" data-v="bs">Bolívares (Bs.)</button></div>
-    <div class="field-row">
-      <div class="field"><label id="l-price">Precio</label><input type="number" id="f-price" placeholder="Ej: 185000" min="0"></div>
-      <div class="field"><label id="l-negot">¿Precio negociable?</label><select id="f-negot"><option id="o-no">No</option><option id="o-yes">Sí</option></select></div>
-    </div>
+    <div class="price-type"><button class="ptype on">USD ($)</button><button class="ptype">Bolivares (Bs.)</button></div>
+    <div class="field-row"><div class="field"><label id="l-price">Precio</label><input type="number" id="f-price" placeholder="Ej: 185000" min="0"></div><div class="field"><label id="l-negot">Precio negociable?</label><select id="f-negot"><option id="o-no">No</option><option id="o-yes">Si</option></select></div></div>
   </div>
-
   <div class="fcard">
     <div class="fcard-title"><div class="num">6</div><span id="fs6">Fotos</span></div>
-    <div class="upload-area">
-      <div class="uico">📷</div>
-      <p><span id="up-main">Arrastra tus fotos aquí o</span> <span id="up-browse" style="color:#1D9E75;font-weight:500">selecciona archivos</span></p>
-      <p style="font-size:12px;color:#bbb;margin-top:5px" id="up-hint">JPG, PNG · Máximo 20 fotos · 10 MB por foto</p>
-    </div>
+    <div class="upload-area"><div class="uico">&#128247;</div><p><span id="up-main">Arrastra tus fotos aqui o</span> <span id="up-browse" style="color:#1D9E75;font-weight:500">selecciona archivos</span></p><p style="font-size:12px;color:#bbb;margin-top:5px" id="up-hint">JPG, PNG · Max 20 fotos</p></div>
   </div>
-
   <div class="fcard">
     <div class="fcard-title"><div class="num">7</div><span id="fs7">Datos de contacto</span></div>
-    <div class="field-row">
-      <div class="field"><label id="l-cname">Nombre completo</label><input type="text" id="f-cname" placeholder="Tu nombre"></div>
-      <div class="field"><label id="l-cphone">Teléfono / WhatsApp</label><input type="tel" id="f-cphone" placeholder="+58 412 000 0000"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label id="l-cemail">Correo electrónico</label><input type="email" id="f-cemail" placeholder="tucorreo@email.com"></div>
-      <div class="field"><label id="l-crole">Eres</label><select id="f-crole"><option id="o-owner">Propietario</option><option id="o-agent">Agente / Corredor</option><option id="o-builder">Constructora</option></select></div>
-    </div>
+    <div class="field-row"><div class="field"><label id="l-cname">Nombre completo</label><input type="text" id="f-cname" placeholder="Tu nombre"></div><div class="field"><label id="l-cphone">Telefono / WhatsApp</label><input type="tel" id="f-cphone" placeholder="+58 412 000 0000"></div></div>
+    <div class="field-row"><div class="field"><label id="l-cemail">Correo electronico</label><input type="email" id="f-cemail" placeholder="tucorreo@email.com"></div><div class="field"><label id="l-crole">Eres</label><select id="f-crole"><option id="o-owner">Propietario</option><option id="o-agent">Agente / Corredor</option><option id="o-builder">Constructora</option></select></div></div>
   </div>
-
-  <div class="submit-row">
-    <button class="btn-cancel" id="btn-cancel" onclick="goTo('home')">Cancelar</button>
-    <button class="btn-submit" id="btn-submit">Publicar anuncio →</button>
-  </div>
+  <div class="submit-row"><button class="btn-cancel" id="btn-cancel" onclick="goTo('home')">Cancelar</button><button class="btn-submit" id="btn-submit">Publicar anuncio &rarr;</button></div>
 </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-const listings=[
-  {id:0,sale:true,feat:true,title_es:'Apartamento moderno en Las Mercedes',title_en:'Modern apartment in Las Mercedes',loc:'Caracas, Miranda',price:'$185,000',beds:3,baths:2,sqm:120,floor:5,parking:1,elevator:2,condo:120,year:2018,negot:true,desc_es:'Hermoso apartamento completamente remodelado en una de las zonas más exclusivas de Caracas. Acabados de primera, cocina empotrada, piso de porcelanato y excelente iluminación natural. Edificio con seguridad 24h y piscina.',desc_en:'Beautiful fully renovated apartment in one of the most exclusive areas of Caracas. Top-quality finishes, built-in kitchen, porcelain floors and excellent natural light. Building with 24h security and pool.',amenities:['balcony','pool','ac','kitchen','security'],gradient:'linear-gradient(135deg,#a8e6cf,#1D9E75)'},
-  {id:1,sale:false,feat:false,title_es:'Casa amplia en El Hatillo',title_en:'Spacious house in El Hatillo',loc:'Caracas, Miranda',price:'$1,200',mo:true,beds:4,baths:3,sqm:210,floor:0,parking:2,elevator:0,condo:0,year:2005,negot:false,desc_es:'Espléndida casa en urbanización privada de El Hatillo. Amplio jardín, parrillera, piscina privada y área de juegos. Ideal para familia. Cerca de colegios y centros comerciales.',desc_en:'Splendid house in private development in El Hatillo. Large garden, BBQ area, private pool and play area. Ideal for families. Close to schools and shopping centers.',amenities:['pool','bbq','security','partyroom','sports','playground'],gradient:'linear-gradient(135deg,#b5d4f4,#378ADD)'},
-  {id:2,sale:true,feat:false,title_es:'Estudio en Altamira',title_en:'Studio in Altamira',loc:'Caracas, Miranda',price:'$62,000',beds:1,baths:1,sqm:48,floor:8,parking:1,elevator:2,condo:60,year:2015,negot:true,desc_es:'Moderno estudio en edificio de lujo en Altamira. Perfecto para jóvenes profesionales o como inversión. Excelente ubicación con fácil acceso al metro.',desc_en:'Modern studio in luxury building in Altamira. Perfect for young professionals or as investment. Excellent location with easy metro access.',amenities:['ac','kitchen','security','gym'],gradient:'linear-gradient(135deg,#ffd3b6,#D85A30)'},
-  {id:3,sale:false,feat:false,title_es:'Penthouse en Valencia Centro',title_en:'Penthouse in Valencia Centro',loc:'Valencia, Carabobo',price:'$2,500',mo:true,beds:5,baths:4,sqm:320,floor:14,parking:3,elevator:3,condo:300,year:2020,negot:false,desc_es:'Exclusivo penthouse con vista panorámica de Valencia. Terraza privada, jacuzzi, cocina gourmet y salón de fiestas para residentes.',desc_en:'Exclusive penthouse with panoramic views of Valencia. Private terrace, jacuzzi, gourmet kitchen and party hall for residents.',amenities:['balcony','ac','kitchen','security','partyroom','gym','pool'],gradient:'linear-gradient(135deg,#d4b8e0,#7b4fa6)'},
-  {id:4,sale:true,feat:false,title_es:'Casa familiar en Maracaibo Norte',title_en:'Family home in Maracaibo Norte',loc:'Maracaibo, Zulia',price:'$230,000',beds:4,baths:3,sqm:280,floor:0,parking:2,elevator:0,condo:0,year:2010,negot:true,desc_es:'Amplia casa de dos plantas en tranquila urbanización al norte de Maracaibo. Patio interno, área de lavado, depósito y cancha deportiva comunitaria.',desc_en:'Spacious two-story house in quiet residential area in north Maracaibo. Internal patio, laundry area, storage and community sports court.',amenities:['bbq','security','sports','laundry','storage'],gradient:'linear-gradient(135deg,#fce4a0,#e5a000)'},
-  {id:5,sale:false,feat:false,title_es:'Apartamento 2 hab. en Barquisimeto',title_en:'2-bed apartment in Barquisimeto',loc:'Barquisimeto, Lara',price:'$650',mo:true,beds:2,baths:2,sqm:85,floor:3,parking:1,elevator:1,condo:50,year:2012,negot:false,desc_es:'Cómodo apartamento en el corazón de Barquisimeto. Recién pintado, cocina empotrada y balcón con vista a la ciudad. Vigilancia 24h.',desc_en:'Comfortable apartment in the heart of Barquisimeto. Freshly painted, built-in kitchen and balcony with city views. 24h surveillance.',amenities:['balcony','ac','kitchen','security'],gradient:'linear-gradient(135deg,#b2dfdb,#00897B)'},
+var listings = [
+  {id:0,sale:true,feat:true,type:'apt',title_es:'Apartamento moderno en Las Mercedes',title_en:'Modern apartment in Las Mercedes',loc:'Caracas, Miranda',price:'$185,000',pval:185000,mo:false,beds:3,baths:2,sqm:120,floor:5,parking:1,elev:2,condo:120,year:2018,negot:true,lat:10.4925,lng:-66.8541,desc_es:'Hermoso apartamento remodelado en Las Mercedes. Acabados de primera, cocina empotrada y piscina.',desc_en:'Beautiful renovated apartment in Las Mercedes. Top finishes, built-in kitchen and pool.',amen:['balcony','pool','ac','kitchen','security'],grad:'linear-gradient(135deg,#a8e6cf,#1D9E75)'},
+  {id:1,sale:false,feat:false,type:'house',title_es:'Casa amplia en El Hatillo',title_en:'Spacious house in El Hatillo',loc:'Caracas, Miranda',price:'$1,200',pval:1200,mo:true,beds:4,baths:3,sqm:210,floor:0,parking:2,elev:0,condo:0,year:2005,negot:false,lat:10.4365,lng:-66.8190,desc_es:'Espléndida casa en El Hatillo con jardín, parrillera y piscina privada.',desc_en:'Splendid house in El Hatillo with garden, BBQ and private pool.',amen:['pool','bbq','security','partyroom','sports'],grad:'linear-gradient(135deg,#b5d4f4,#378ADD)'},
+  {id:2,sale:true,feat:false,type:'studio',title_es:'Estudio en Altamira',title_en:'Studio in Altamira',loc:'Caracas, Miranda',price:'$62,000',pval:62000,mo:false,beds:1,baths:1,sqm:48,floor:8,parking:1,elev:2,condo:60,year:2015,negot:true,lat:10.4972,lng:-66.8489,desc_es:'Moderno estudio en edificio de lujo en Altamira. Ideal para inversión.',desc_en:'Modern studio in luxury building in Altamira. Ideal as investment.',amen:['ac','kitchen','security','gym'],grad:'linear-gradient(135deg,#ffd3b6,#D85A30)'},
+  {id:3,sale:false,feat:false,type:'pent',title_es:'Penthouse en Valencia Centro',title_en:'Penthouse in Valencia Centro',loc:'Valencia, Carabobo',price:'$2,500',pval:2500,mo:true,beds:5,baths:4,sqm:320,floor:14,parking:3,elev:3,condo:300,year:2020,negot:false,lat:10.1620,lng:-68.0020,desc_es:'Exclusivo penthouse con vista panorámica, jacuzzi y cocina gourmet.',desc_en:'Exclusive penthouse with panoramic view, jacuzzi and gourmet kitchen.',amen:['balcony','ac','kitchen','security','partyroom','gym','pool'],grad:'linear-gradient(135deg,#d4b8e0,#7b4fa6)'},
+  {id:4,sale:true,feat:false,type:'house',title_es:'Casa familiar en Maracaibo Norte',title_en:'Family home in Maracaibo Norte',loc:'Maracaibo, Zulia',price:'$230,000',pval:230000,mo:false,beds:4,baths:3,sqm:280,floor:0,parking:2,elev:0,condo:0,year:2010,negot:true,lat:10.6730,lng:-71.6125,desc_es:'Amplia casa de dos plantas al norte de Maracaibo con cancha deportiva.',desc_en:'Spacious two-story house in north Maracaibo with sports court.',amen:['bbq','security','sports','laundry','storage'],grad:'linear-gradient(135deg,#fce4a0,#e5a000)'},
+  {id:5,sale:false,feat:false,type:'apt',title_es:'Apartamento 2 hab. en Barquisimeto',title_en:'2-bed apartment in Barquisimeto',loc:'Barquisimeto, Lara',price:'$650',pval:650,mo:true,beds:2,baths:2,sqm:85,floor:3,parking:1,elev:1,condo:50,year:2012,negot:false,lat:10.0680,lng:-69.3474,desc_es:'Cómodo apartamento con balcón y cocina empotrada en Barquisimeto.',desc_en:'Comfortable apartment with balcony and built-in kitchen in Barquisimeto.',amen:['balcony','ac','kitchen','security'],grad:'linear-gradient(135deg,#b2dfdb,#00897B)'}
 ];
 
-const amenitiesData=[
-  {id:'balcony',ico:'🌿',es:'Balcón',en:'Balcony'},
-  {id:'pool',ico:'🏊',es:'Piscina',en:'Swimming pool'},
-  {id:'bbq',ico:'🔥',es:'Parrillera',en:'BBQ area'},
-  {id:'ac',ico:'❄️',es:'Aire acondicionado',en:'Air conditioning'},
-  {id:'kitchen',ico:'🍳',es:'Cocina empotrada',en:'Built-in kitchen'},
-  {id:'security',ico:'🛡️',es:'Vigilancia',en:'Security'},
-  {id:'partyroom',ico:'🎉',es:'Salón de fiestas',en:'Party hall'},
-  {id:'sports',ico:'⚽',es:'Cancha deportiva',en:'Sports court'},
-  {id:'gym',ico:'💪',es:'Gimnasio',en:'Gym'},
-  {id:'playground',ico:'🛝',es:'Área de juegos',en:'Playground'},
-  {id:'laundry',ico:'🧺',es:'Área de lavado',en:'Laundry area'},
-  {id:'storage',ico:'📦',es:'Maletero / Depósito',en:'Storage room'},
+var amenData = [
+  {id:'balcony',es:'Balcon',en:'Balcony'},
+  {id:'pool',es:'Piscina',en:'Swimming pool'},
+  {id:'bbq',es:'Parrillera',en:'BBQ area'},
+  {id:'ac',es:'Aire acondicionado',en:'Air conditioning'},
+  {id:'kitchen',es:'Cocina empotrada',en:'Built-in kitchen'},
+  {id:'security',es:'Vigilancia',en:'Security'},
+  {id:'partyroom',es:'Salon de fiestas',en:'Party hall'},
+  {id:'sports',es:'Cancha deportiva',en:'Sports court'},
+  {id:'gym',es:'Gimnasio',en:'Gym'},
+  {id:'playground',es:'Area de juegos',en:'Playground'},
+  {id:'laundry',es:'Area de lavado',en:'Laundry area'},
+  {id:'storage',es:'Deposito',en:'Storage room'}
 ];
 
-let lang='es';
+var lang = 'es';
+var leafMap = null;
+var mapMarkers = {};
+var activePin = -1;
+var detailFrom = 'home';
+var mobShowMap = false;
 
-const T={
-  es:{navBuy:'Comprar',navRent:'Alquilar',navAgents:'Agentes',navList:'Publicar propiedad',heroBadge:'La plataforma inmobiliaria moderna de Venezuela',heroTitle:'Encuentra tu hogar ideal<br>en Venezuela',heroSub:'Compra, vende o alquila apartamentos y casas en Caracas, Valencia, Maracaibo y mucho más.',inpLoc:'Ciudad, zona o dirección…',tabBuy:'Comprar',tabRent:'Alquilar',tabSell:'Vender',optType:'Todos los tipos',optApt:'Apartamento',optHouse:'Casa',optStudio:'Estudio',optPent:'Penthouse',optBeds:'Habitaciones',optPrice:'Cualquier precio',optP1:'Menos de $50k',optP2:'$50k – $150k',optP3:'$150k – $300k',optP4:'$300k+',search:'Buscar',stat1:'Anuncios activos',stat2:'Ciudades',stat3:'Agentes verificados',stat4:'Satisfacción',secFeat:'Propiedades destacadas',lnkAll:'Ver todas →',howTitle:'¿Cómo funciona?',howSub:'Pasos simples para encontrar o publicar tu propiedad',s1:'Busca y filtra',s1d:'Explora miles de anuncios verificados por ciudad, precio, tipo y tamaño.',s2:'Agenda una visita',s2d:'Reserva una visita directamente con el agente o propietario en segundos.',s3:'Proceso rápido y seguro',s3d:'Todos los anuncios son verificados. Comunícate y cierra con confianza.',s4:'Mudarse o cerrar trato',s4d:'Finaliza tu alquiler o compra con apoyo completo de un agente local.',secCities:'Explorar por ciudad',cityMore:'+ Más ciudades',cityMoreSub:'18 en total',cityLbl:'anuncios',ctaTitle:'Publica tu propiedad gratis',ctaSub:'Llega a miles de compradores e inquilinos verificados en Venezuela. Sin costos iniciales ni comisiones.',ctaBtn:'Empezar ahora →',signin:'Iniciar sesión',post:'Publicar anuncio',ftAbout:'Nosotros',ftContact:'Contacto',ftPrivacy:'Privacidad',ftTerms:'Términos',ftCopy:'© 2026 CasaVen. Todos los derechos reservados.',badgeSale:'En venta',badgeRent:'En alquiler',badgeFeat:'Destacado',cardBeds:'hab.',cardBaths:'baños',cardMo:'/mes',detBack:'Volver a resultados',detNegot:'Precio negociable',detBedsLbl:'Hab.',detBathsLbl:'Baños',detFloorLbl:'Piso',detParkLbl:'Estac.',detElevLbl:'Ascensor',detDescTitle:'Descripción',detAmenTitle:'Comodidades',detDetTitle:'Detalles adicionales',detAgentRole:'Agente verificado · CasaVen',detWa:'💬 WhatsApp',detCall:'Llamar',detEmailBtn:'Enviar mensaje',detMapLbl:'Ver en el mapa',detGalCount:'+4 fotos',detCondo:'Condominio mensual',detYear:'Año de construcción',detFloorD:'Piso',detParkD:'Estacionamiento',phTitle:'Publicar propiedad',phSub:'Completa los datos de tu inmueble para llegar a miles de compradores e inquilinos.',fs1:'Información básica',fs2:'Ubicación',fs3:'Detalles del inmueble',fs4:'Comodidades y características',fs5:'Precio',fs6:'Fotos',fs7:'Datos de contacto',lOptype:'Tipo de operación',lProptype:'Tipo de inmueble',oSale:'En venta',oRent:'En alquiler',oApt:'Apartamento',oHouse:'Casa',oStudio:'Estudio',oPent:'Penthouse',oLand:'Terreno',oOffice:'Oficina',lFtitle:'Título del anuncio',lDesc:'Descripción',lState:'Estado',lCity:'Ciudad',lZone:'Urbanización / Zona',lAddr:'Dirección (opcional)',lAddrHint:'Tu dirección exacta solo será visible para contactos verificados.',lBeds:'Habitaciones',lBaths:'Número de baños',lSqm:'Metros cuadrados (m²)',lFloor:'Piso',lElevators:'Ascensores',oNone:'Ninguno',lParking:'Puestos de estacionamiento',oNopark:'Sin estacionamiento',lCondo:'Condominio mensual (USD)',lCondoHint:'Deja en blanco si no aplica.',lYear:'Año de construcción',lPrice:'Precio',lNegot:'¿Precio negociable?',oNo:'No',oYes:'Sí',upMain:'Arrastra tus fotos aquí o',upBrowse:'selecciona archivos',upHint:'JPG, PNG · Máximo 20 fotos · 10 MB por foto',lCname:'Nombre completo',lCphone:'Teléfono / WhatsApp',lCemail:'Correo electrónico',lCrole:'Eres',oOwner:'Propietario',oAgent:'Agente / Corredor',oBuilder:'Constructora',cancel:'Cancelar',submit:'Publicar anuncio →'},
-  en:{navBuy:'Buy',navRent:'Rent',navAgents:'Agents',navList:'List property',heroBadge:"Venezuela's modern property platform",heroTitle:'Find your perfect home<br>in Venezuela',heroSub:'Buy, sell or rent apartments and houses across Caracas, Valencia, Maracaibo and beyond.',inpLoc:'City, neighborhood, or address…',tabBuy:'Buy',tabRent:'Rent',tabSell:'Sell',optType:'All types',optApt:'Apartment',optHouse:'House',optStudio:'Studio',optPent:'Penthouse',optBeds:'Any beds',optPrice:'Any price',optP1:'Under $50k',optP2:'$50k – $150k',optP3:'$150k – $300k',optP4:'$300k+',search:'Search',stat1:'Active listings',stat2:'Cities covered',stat3:'Verified agents',stat4:'Satisfaction rate',secFeat:'Featured listings',lnkAll:'View all →',howTitle:'How it works',howSub:'Simple steps to find or list your property',s1:'Search & filter',s1d:'Browse thousands of verified listings by city, price, type, and size.',s2:'Schedule a visit',s2d:'Book a viewing directly with the agent or owner in seconds.',s3:'Fast & secure process',s3d:'All listings are verified. Communicate and close deals safely.',s4:'Move in or close',s4d:'Complete your rental or purchase with full agent support.',secCities:'Browse by city',cityMore:'+ More cities',cityMoreSub:'18 cities total',cityLbl:'listings',ctaTitle:'List your property for free',ctaSub:'Reach thousands of verified buyers and renters across Venezuela. No upfront costs, no commissions.',ctaBtn:'Get started →',signin:'Sign in',post:'Post listing',ftAbout:'About',ftContact:'Contact',ftPrivacy:'Privacy',ftTerms:'Terms',ftCopy:'© 2026 CasaVen. All rights reserved.',badgeSale:'For sale',badgeRent:'For rent',badgeFeat:'Featured',cardBeds:'beds',cardBaths:'baths',cardMo:'/mo',detBack:'Back to results',detNegot:'Negotiable price',detBedsLbl:'Beds',detBathsLbl:'Baths',detFloorLbl:'Floor',detParkLbl:'Parking',detElevLbl:'Elevator',detDescTitle:'Description',detAmenTitle:'Amenities',detDetTitle:'Additional details',detAgentRole:'Verified agent · CasaVen',detWa:'💬 WhatsApp',detCall:'Call',detEmailBtn:'Send message',detMapLbl:'View on map',detGalCount:'+4 photos',detCondo:'Monthly HOA fee',detYear:'Year built',detFloorD:'Floor',detParkD:'Parking',phTitle:'Post a property',phSub:'Fill in your property details to reach thousands of buyers and renters.',fs1:'Basic information',fs2:'Location',fs3:'Property details',fs4:'Amenities & features',fs5:'Price',fs6:'Photos',fs7:'Contact information',lOptype:'Listing type',lProptype:'Property type',oSale:'For sale',oRent:'For rent',oApt:'Apartment',oHouse:'House',oStudio:'Studio',oPent:'Penthouse',oLand:'Land',oOffice:'Office',lFtitle:'Listing title',lDesc:'Description',lState:'State',lCity:'City',lZone:'Neighborhood / Area',lAddr:'Address (optional)',lAddrHint:'Your exact address will only be visible to verified contacts.',lBeds:'Bedrooms',lBaths:'Number of bathrooms',lSqm:'Square meters (m²)',lFloor:'Floor',lElevators:'Building elevators',oNone:'None',lParking:'Parking spots',oNopark:'No parking',lCondo:'Monthly HOA / Condo fee (USD)',lCondoHint:'Leave blank if not applicable.',lYear:'Year built',lPrice:'Price',lNegot:'Negotiable price?',oNo:'No',oYes:'Yes',upMain:'Drag your photos here or',upBrowse:'browse files',upHint:'JPG, PNG · Up to 20 photos · 10 MB per photo',lCname:'Full name',lCphone:'Phone / WhatsApp',lCemail:'Email address',lCrole:'You are',oOwner:'Property owner',oAgent:'Agent / Broker',oBuilder:'Developer',cancel:'Cancel',submit:'Post listing →'}
+var T = {
+  es:{navBuy:'Comprar',navRent:'Alquilar',navMapLbl:'Mapa',navList:'Publicar propiedad',heroBadge:'La plataforma inmobiliaria moderna de Venezuela',heroTitle:'Encuentra tu hogar ideal<br>en Venezuela',heroSub:'Compra, vende o alquila apartamentos y casas en Caracas, Valencia, Maracaibo y más.',inpLoc:'Ciudad, zona o dirección…',tabBuy:'Comprar',tabRent:'Alquilar',tabSell:'Vender',optType:'Todos los tipos',optApt:'Apartamento',optHouse:'Casa',optStudio:'Estudio',optPent:'Penthouse',optBeds:'Habitaciones',optPrice:'Cualquier precio',optP1:'Menos de $50k',optP2:'$50k-$150k',optP3:'$150k-$300k',optP4:'$300k+',search:'Buscar',stat1:'Anuncios activos',stat2:'Ciudades',stat3:'Agentes verificados',stat4:'Satisfaccion',secFeat:'Propiedades destacadas',lnkAll:'Ver todas',howTitle:'Como funciona',howSub:'Pasos simples para encontrar o publicar tu propiedad',s1:'Busca y filtra',s1d:'Explora miles de anuncios por ciudad, precio y tipo.',s2:'Agenda una visita',s2d:'Reserva con el agente en segundos.',s3:'Proceso rapido y seguro',s3d:'Todos los anuncios son verificados.',s4:'Mudarse o cerrar trato',s4d:'Finaliza con apoyo completo de un agente local.',secCities:'Explorar por ciudad',cityMore:'+ Mas ciudades',cityMoreSub:'18 en total',cityLbl:'anuncios',ctaTitle:'Publica tu propiedad gratis',ctaSub:'Llega a miles de compradores e inquilinos. Sin costos iniciales.',ctaBtn:'Empezar ahora',signin:'Iniciar sesion',post:'Publicar anuncio',ftAbout:'Nosotros',ftContact:'Contacto',ftPrivacy:'Privacidad',ftTerms:'Terminos',ftCopy:'2026 CasaVen.',badgeSale:'En venta',badgeRent:'En alquiler',badgeFeat:'Destacado',cardBeds:'hab.',cardBaths:'banos',cardMo:'/mes',mapLocPh:'Ciudad o zona…',mvtList:'Lista',mvtMap:'Mapa',mobToggleMap:'Ver mapa',mobToggleList:'Ver lista',countFound:'propiedades',noResults:'Sin resultados.',detBack:'Volver',detNegot:'Precio negociable',detBedsLbl:'Hab.',detBathsLbl:'Banos',detFloorLbl:'Piso',detParkLbl:'Estac.',detElevLbl:'Ascensor',detDescTitle:'Descripcion',detAmenTitle:'Comodidades',detDetTitle:'Detalles',detAgentRole:'Agente verificado · CasaVen',detWa:'WhatsApp',detCall:'Llamar',detEmail:'Mensaje',detMapLbl:'Ver en el mapa',detGalCount:'+4 fotos',detCondo:'Condominio',detYear:'Ano constr.',detFloorD:'Piso',detParkD:'Estacionamiento',phTitle:'Publicar propiedad',phSub:'Completa los datos de tu inmueble.',fs1:'Informacion basica',fs2:'Ubicacion',fs3:'Detalles',fs4:'Comodidades',fs5:'Precio',fs6:'Fotos',fs7:'Contacto',lOptype:'Tipo operacion',lProptype:'Tipo inmueble',oSale:'En venta',oRent:'En alquiler',oApt:'Apartamento',oHouse:'Casa',oStudio:'Estudio',oPent:'Penthouse',oLand:'Terreno',oOffice:'Oficina',lFtitle:'Titulo',lDesc:'Descripcion',lState:'Estado',lCity:'Ciudad',lZone:'Zona',lAddr:'Direccion (opcional)',lAddrHint:'Solo visible para contactos verificados.',lBeds:'Habitaciones',lBaths:'Banos',lSqm:'Metros cuadrados',lFloor:'Piso',lElevators:'Ascensores',oNone:'Ninguno',lParking:'Estacionamiento',oNopark:'Sin estacionamiento',lCondo:'Condominio mensual (USD)',lCondoHint:'Dejar en blanco si no aplica.',lYear:'Ano construccion',lPrice:'Precio',lNegot:'Precio negociable?',oNo:'No',oYes:'Si',upMain:'Arrastra fotos o',upBrowse:'selecciona archivos',upHint:'JPG PNG Max 20 fotos',lCname:'Nombre',lCphone:'Telefono / WhatsApp',lCemail:'Correo',lCrole:'Eres',oOwner:'Propietario',oAgent:'Agente',oBuilder:'Constructora',cancel:'Cancelar',submit:'Publicar anuncio'},
+  en:{navBuy:'Buy',navRent:'Rent',navMapLbl:'Map',navList:'List property',heroBadge:"Venezuela's modern property platform",heroTitle:'Find your perfect home<br>in Venezuela',heroSub:'Buy, sell or rent apartments and houses across Venezuela.',inpLoc:'City, neighborhood, or address…',tabBuy:'Buy',tabRent:'Rent',tabSell:'Sell',optType:'All types',optApt:'Apartment',optHouse:'House',optStudio:'Studio',optPent:'Penthouse',optBeds:'Any beds',optPrice:'Any price',optP1:'Under $50k',optP2:'$50k-$150k',optP3:'$150k-$300k',optP4:'$300k+',search:'Search',stat1:'Active listings',stat2:'Cities covered',stat3:'Verified agents',stat4:'Satisfaction',secFeat:'Featured listings',lnkAll:'View all',howTitle:'How it works',howSub:'Simple steps to find or list your property',s1:'Search & filter',s1d:'Browse thousands of listings by city, price and type.',s2:'Schedule a visit',s2d:'Book a viewing in seconds.',s3:'Fast & secure',s3d:'All listings are verified.',s4:'Move in or close',s4d:'Complete with full agent support.',secCities:'Browse by city',cityMore:'+ More cities',cityMoreSub:'18 cities total',cityLbl:'listings',ctaTitle:'List your property for free',ctaSub:'Reach thousands of verified buyers and renters.',ctaBtn:'Get started',signin:'Sign in',post:'Post listing',ftAbout:'About',ftContact:'Contact',ftPrivacy:'Privacy',ftTerms:'Terms',ftCopy:'2026 CasaVen.',badgeSale:'For sale',badgeRent:'For rent',badgeFeat:'Featured',cardBeds:'beds',cardBaths:'baths',cardMo:'/mo',mapLocPh:'City or area…',mvtList:'List',mvtMap:'Map',mobToggleMap:'View map',mobToggleList:'View list',countFound:'properties',noResults:'No results found.',detBack:'Back',detNegot:'Negotiable',detBedsLbl:'Beds',detBathsLbl:'Baths',detFloorLbl:'Floor',detParkLbl:'Parking',detElevLbl:'Elevator',detDescTitle:'Description',detAmenTitle:'Amenities',detDetTitle:'Details',detAgentRole:'Verified agent · CasaVen',detWa:'WhatsApp',detCall:'Call',detEmail:'Message',detMapLbl:'View on map',detGalCount:'+4 photos',detCondo:'HOA fee',detYear:'Year built',detFloorD:'Floor',detParkD:'Parking',phTitle:'Post a property',phSub:'Fill in your property details.',fs1:'Basic info',fs2:'Location',fs3:'Details',fs4:'Amenities',fs5:'Price',fs6:'Photos',fs7:'Contact',lOptype:'Listing type',lProptype:'Property type',oSale:'For sale',oRent:'For rent',oApt:'Apartment',oHouse:'House',oStudio:'Studio',oPent:'Penthouse',oLand:'Land',oOffice:'Office',lFtitle:'Title',lDesc:'Description',lState:'State',lCity:'City',lZone:'Area',lAddr:'Address (optional)',lAddrHint:'Only visible to verified contacts.',lBeds:'Bedrooms',lBaths:'Bathrooms',lSqm:'Square meters',lFloor:'Floor',lElevators:'Elevators',oNone:'None',lParking:'Parking',oNopark:'No parking',lCondo:'Monthly HOA (USD)',lCondoHint:'Leave blank if not applicable.',lYear:'Year built',lPrice:'Price',lNegot:'Negotiable?',oNo:'No',oYes:'Yes',upMain:'Drag photos here or',upBrowse:'browse files',upHint:'JPG PNG Max 20 photos',lCname:'Full name',lCphone:'Phone / WhatsApp',lCemail:'Email',lCrole:'You are',oOwner:'Owner',oAgent:'Agent / Broker',oBuilder:'Developer',cancel:'Cancel',submit:'Post listing'}
 };
 
-function goTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('pg-'+pg).classList.add('active');window.scrollTo(0,0);}
-function closeMM(){document.getElementById('mobile-menu').classList.remove('open');}
+function goTo(pg) {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('pg-'+pg).classList.add('active');
+  window.scrollTo(0,0);
+  if (pg === 'map') {
+    setTimeout(function(){
+      if (!leafMap) initMap();
+      else leafMap.invalidateSize();
+    }, 100);
+  }
+}
 
-document.getElementById('nav-menu-btn').onclick=()=>document.getElementById('mobile-menu').classList.toggle('open');
+function closeMM() {
+  document.getElementById('mobile-menu').classList.remove('open');
+}
 
-function renderCards(){
-  const d=T[lang],c=document.getElementById('cards-container');
-  c.innerHTML='';
-  listings.forEach(l=>{
-    const div=document.createElement('div');
-    div.className='prop-card';
-    const priceStr=l.mo?l.price+'<small>'+d.cardMo+'</small>':l.price;
-    div.innerHTML=`<div class="card-img" style="background:${l.gradient}"><div class="card-badges"><span class="badge ${l.sale?'badge-sale':'badge-rent'}">${l.sale?d.badgeSale:d.badgeRent}</span>${l.feat?`<span class="badge badge-feat">${d.badgeFeat}</span>`:''}</div><div class="heart" data-id="${l.id}">♡</div></div><div class="card-body"><div class="card-title-txt">${l['title_'+lang]}</div><div class="card-loc">📍 ${l.loc}</div><div class="card-price">${priceStr}</div><div class="card-meta"><span>🛏 ${l.beds} ${d.cardBeds}</span><span>🚿 ${l.baths} ${d.cardBaths}</span><span>📐 ${l.sqm} m²</span></div></div>`;
-    div.querySelector('.heart').onclick=function(e){e.stopPropagation();this.textContent=this.textContent==='♡'?'♥':'♡';this.style.color=this.textContent==='♥'?'#e74c3c':'';};
-    div.onclick=function(e){if(e.target.classList.contains('heart'))return;openDetail(l.id);};
+document.getElementById('nav-menu-btn').onclick = function(){
+  document.getElementById('mobile-menu').classList.toggle('open');
+};
+
+function initMap() {
+  leafMap = L.map('map-el').setView([8.0, -66.5], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(leafMap);
+  applyMapFilters();
+}
+
+function makePinIcon(l, active) {
+  var d = T[lang];
+  var price = l.mo ? l.price + d.cardMo : l.price;
+  var cls = 'map-pin' + (l.sale ? '' : ' rent') + (active ? ' active-pin' : '');
+  return L.divIcon({
+    className: '',
+    html: '<div class="' + cls + '">' + price + '</div>',
+    iconSize: null,
+    iconAnchor: [0, 8]
+  });
+}
+
+function clearMarkers() {
+  Object.keys(mapMarkers).forEach(function(k){
+    leafMap.removeLayer(mapMarkers[k]);
+  });
+  mapMarkers = {};
+}
+
+function setActivePin(id) {
+  if (activePin >= 0 && mapMarkers[activePin]) {
+    var old = listings[activePin];
+    mapMarkers[activePin].setIcon(makePinIcon(old, false));
+  }
+  activePin = id;
+  if (id >= 0 && mapMarkers[id]) {
+    mapMarkers[id].setIcon(makePinIcon(listings[id], true));
+  }
+  document.querySelectorAll('.map-card').forEach(function(c){c.classList.remove('active');});
+  var card = document.getElementById('mc-' + id);
+  if (card) { card.classList.add('active'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+function getFiltered() {
+  var optype = document.getElementById('map-optype').value;
+  var type   = document.getElementById('map-type').value;
+  var price  = document.getElementById('map-price').value;
+  var beds   = document.getElementById('map-beds').value;
+  var loc    = document.getElementById('map-loc').value.toLowerCase().trim();
+  return listings.filter(function(l){
+    if (optype === 'sale' && !l.sale) return false;
+    if (optype === 'rent' && l.sale)  return false;
+    if (type && l.type !== type) return false;
+    if (price === '1' && l.pval >= 50000) return false;
+    if (price === '2' && (l.pval < 50000  || l.pval > 150000)) return false;
+    if (price === '3' && (l.pval < 150000 || l.pval > 300000)) return false;
+    if (price === '4' && l.pval < 300000) return false;
+    if (beds && l.beds < parseInt(beds)) return false;
+    if (loc && l['title_'+lang].toLowerCase().indexOf(loc) < 0 && l.loc.toLowerCase().indexOf(loc) < 0) return false;
+    return true;
+  });
+}
+
+function applyMapFilters() {
+  var filtered = getFiltered();
+  clearMarkers();
+  var d = T[lang];
+  document.getElementById('map-count-lbl').textContent = filtered.length + ' ' + d.countFound;
+  var cards = document.getElementById('map-cards');
+  cards.innerHTML = '';
+  if (filtered.length === 0) {
+    cards.innerHTML = '<div class="no-results">' + d.noResults + '</div>';
+    return;
+  }
+  filtered.forEach(function(l){
+    var m = L.marker([l.lat, l.lng], {icon: makePinIcon(l, false)}).addTo(leafMap);
+    m.on('click', function(){ setActivePin(l.id); });
+    mapMarkers[l.id] = m;
+    var div = document.createElement('div');
+    div.className = 'map-card';
+    div.id = 'mc-' + l.id;
+    var priceStr = l.mo ? l.price + '<small>' + d.cardMo + '</small>' : l.price;
+    div.innerHTML = '<div style="display:flex">'
+      + '<div class="map-card-img" style="background:' + l.grad + '"></div>'
+      + '<div class="map-card-body">'
+      + '<div class="map-card-title">' + l['title_'+lang] + '</div>'
+      + '<div class="map-card-loc">&#128205; ' + l.loc + '</div>'
+      + '<div class="map-card-price">' + priceStr + '</div>'
+      + '<div class="map-card-meta"><span>&#128716; ' + l.beds + ' ' + d.cardBeds + '</span><span>&#128208; ' + l.sqm + 'm²</span></div>'
+      + '</div></div>';
+    div.onmouseenter = function(){ setActivePin(l.id); };
+    div.onclick = function(){ detailFrom = 'map'; openDetail(l.id); };
+    cards.appendChild(div);
+  });
+  if (filtered.length > 0) {
+    var bounds = filtered.map(function(l){ return [l.lat, l.lng]; });
+    leafMap.fitBounds(bounds, {padding:[48,48], maxZoom:13});
+  }
+}
+
+['map-optype','map-type','map-price','map-beds'].forEach(function(id){
+  document.getElementById(id).addEventListener('change', function(){ if(leafMap) applyMapFilters(); });
+});
+document.getElementById('map-loc').addEventListener('input', function(){ if(leafMap) applyMapFilters(); });
+
+function setMapView(v) {
+  document.getElementById('mvt-list').classList.toggle('active', v==='split');
+  document.getElementById('mvt-map').classList.toggle('active', v==='full');
+  document.getElementById('map-list').style.display = v==='full' ? 'none' : '';
+  setTimeout(function(){ if(leafMap) leafMap.invalidateSize(); }, 60);
+}
+
+function toggleMobView() {
+  var d = T[lang];
+  mobShowMap = !mobShowMap;
+  var list = document.getElementById('map-list');
+  var mapEl = document.getElementById('map-el');
+  var btn = document.getElementById('mob-toggle');
+  if (mobShowMap) {
+    list.classList.remove('show-mob'); mapEl.classList.remove('hide-mob');
+    btn.textContent = d.mobToggleList;
+    setTimeout(function(){ if(leafMap) leafMap.invalidateSize(); }, 100);
+  } else {
+    list.classList.add('show-mob'); mapEl.classList.add('hide-mob');
+    btn.textContent = d.mobToggleMap;
+  }
+}
+
+function renderCards() {
+  var d = T[lang];
+  var c = document.getElementById('cards-container');
+  c.innerHTML = '';
+  listings.forEach(function(l){
+    var div = document.createElement('div');
+    div.className = 'prop-card';
+    var priceStr = l.mo ? l.price + '<small>' + d.cardMo + '</small>' : l.price;
+    div.innerHTML = '<div class="card-img" style="background:' + l.grad + '">'
+      + '<div class="card-badges"><span class="badge ' + (l.sale?'badge-sale':'badge-rent') + '">' + (l.sale?d.badgeSale:d.badgeRent) + '</span>'
+      + (l.feat ? '<span class="badge badge-feat">' + d.badgeFeat + '</span>' : '') + '</div>'
+      + '<div class="heart">&#9825;</div></div>'
+      + '<div class="card-body"><div class="card-title-txt">' + l['title_'+lang] + '</div>'
+      + '<div class="card-loc">&#128205; ' + l.loc + '</div>'
+      + '<div class="card-price">' + priceStr + '</div>'
+      + '<div class="card-meta"><span>&#128716; ' + l.beds + ' ' + d.cardBeds + '</span><span>&#128703; ' + l.baths + ' ' + d.cardBaths + '</span><span>&#128208; ' + l.sqm + 'm²</span></div>'
+      + '</div>';
+    div.querySelector('.heart').onclick = function(e){
+      e.stopPropagation();
+      this.innerHTML = this.innerHTML === '&#9825;' ? '&#9829;' : '&#9825;';
+      this.style.color = this.innerHTML === '&#9829;' ? '#e74c3c' : '';
+    };
+    div.onclick = function(e){
+      if (e.target.classList.contains('heart')) return;
+      detailFrom = 'home'; openDetail(l.id);
+    };
     c.appendChild(div);
   });
 }
 
-function openDetail(id){
-  const l=listings[id],d=T[lang];
-  document.getElementById('det-gal-main').style.background=l.gradient;
-  document.getElementById('det-gal-count').textContent=d.detGalCount;
-  document.getElementById('det-back').textContent=d.detBack;
-  const badge=document.getElementById('det-badge');
-  badge.textContent=l.sale?d.badgeSale:d.badgeRent;
-  badge.style.cssText=`background:${l.sale?'#e6f7f2':'#e6f0fb'};color:${l.sale?'#0F6E56':'#185FA5'};padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600`;
-  const fb=document.getElementById('det-feat-badge');
-  fb.style.display=l.feat?'inline-block':'none';
-  fb.textContent=d.badgeFeat;
-  document.getElementById('det-title').textContent=l['title_'+lang];
-  document.getElementById('det-loc').textContent=l.loc;
-  document.getElementById('det-price').innerHTML=l.mo?l.price+'<small>'+d.cardMo+'</small>':l.price;
-  document.getElementById('det-negot').textContent=l.negot?'✓ '+d.detNegot:'';
-  document.getElementById('det-beds').textContent=l.beds;
-  document.getElementById('det-baths').textContent=l.baths;
-  document.getElementById('det-sqm').textContent=l.sqm;
-  document.getElementById('det-floor').textContent=l.floor===0?'PB':l.floor;
-  document.getElementById('det-parking').textContent=l.parking||'—';
-  document.getElementById('det-elevator').textContent=l.elevator||'—';
-  ['det-beds-lbl','det-baths-lbl','det-floor-lbl','det-park-lbl','det-elev-lbl'].forEach((id,i)=>document.getElementById(id).textContent=[d.detBedsLbl,d.detBathsLbl,d.detFloorLbl,d.detParkLbl,d.detElevLbl][i]);
-  document.getElementById('det-desc-title').textContent=d.detDescTitle;
-  document.getElementById('det-desc').textContent=l['desc_'+lang];
-  document.getElementById('det-amenities-title').textContent=d.detAmenTitle;
-  const al=document.getElementById('det-amenities');al.innerHTML='';
-  l.amenities.forEach(aid=>{const a=amenitiesData.find(x=>x.id===aid);if(a){const el=document.createElement('div');el.className='am-item';el.innerHTML=`<span>${a.ico}</span>${a[lang]}`;al.appendChild(el);}});
-  document.getElementById('det-details-title').textContent=d.detDetTitle;
-  const ex=document.getElementById('det-extra');ex.innerHTML='';
-  [[d.detCondo,l.condo?'$'+l.condo+(lang==='es'?'/mes':'/mo'):(lang==='es'?'No aplica':'N/A')],[d.detYear,l.year],[d.detFloorD,l.floor===0?(lang==='es'?'Planta baja':'Ground floor'):l.floor],[d.detParkD,l.parking||(lang==='es'?'No disponible':'Not available')]].forEach(([lbl,val])=>{const el=document.createElement('div');el.className='extra-item';el.innerHTML=`<div class="extra-lbl">${lbl}</div><div class="extra-val">${val}</div>`;ex.appendChild(el);});
-  document.getElementById('det-agent-role').textContent=d.detAgentRole;
-  document.getElementById('det-wa').textContent=d.detWa;
-  document.getElementById('det-call-lbl').textContent=d.detCall;
-  document.getElementById('det-email-lbl').textContent=d.detEmailBtn;
-  document.getElementById('det-map-lbl').textContent=d.detMapLbl;
-  document.getElementById('det-map-addr').textContent='📍 '+l.loc;
+function openDetail(id) {
+  var l = listings[id], d = T[lang];
+  document.getElementById('det-back').textContent = d.detBack;
+  document.getElementById('det-gal-main').style.background = l.grad;
+  document.getElementById('det-gal-count').textContent = d.detGalCount;
+  var badge = document.getElementById('det-badge');
+  badge.textContent = l.sale ? d.badgeSale : d.badgeRent;
+  badge.style.cssText = 'background:' + (l.sale?'#e6f7f2':'#e6f0fb') + ';color:' + (l.sale?'#0F6E56':'#185FA5') + ';padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600';
+  var fb = document.getElementById('det-feat-badge');
+  fb.style.display = l.feat ? 'inline-block' : 'none';
+  fb.textContent = d.badgeFeat;
+  document.getElementById('det-title').textContent = l['title_'+lang];
+  document.getElementById('det-loc').textContent = l.loc;
+  document.getElementById('det-price').innerHTML = l.mo ? l.price + '<small>' + d.cardMo + '</small>' : l.price;
+  document.getElementById('det-negot').textContent = l.negot ? '✓ ' + d.detNegot : '';
+  document.getElementById('det-beds').textContent = l.beds;
+  document.getElementById('det-baths').textContent = l.baths;
+  document.getElementById('det-sqm').textContent = l.sqm;
+  document.getElementById('det-floor').textContent = l.floor === 0 ? 'PB' : l.floor;
+  document.getElementById('det-parking').textContent = l.parking || '-';
+  document.getElementById('det-elevator').textContent = l.elev || '-';
+  ['det-beds-lbl','det-baths-lbl','det-floor-lbl','det-park-lbl','det-elev-lbl'].forEach(function(eid,i){
+    document.getElementById(eid).textContent = [d.detBedsLbl,d.detBathsLbl,d.detFloorLbl,d.detParkLbl,d.detElevLbl][i];
+  });
+  document.getElementById('det-desc-title').textContent = d.detDescTitle;
+  document.getElementById('det-desc').textContent = l['desc_'+lang];
+  document.getElementById('det-amen-title').textContent = d.detAmenTitle;
+  var al = document.getElementById('det-amenities'); al.innerHTML = '';
+  l.amen.forEach(function(aid){
+    var a = amenData.filter(function(x){return x.id===aid;})[0];
+    if (a) { var el = document.createElement('div'); el.className='am-item'; el.textContent = a[lang]; al.appendChild(el); }
+  });
+  document.getElementById('det-det-title').textContent = d.detDetTitle;
+  var ex = document.getElementById('det-extra'); ex.innerHTML = '';
+  [[d.detCondo, l.condo ? '$'+l.condo+(lang==='es'?'/mes':'/mo') : 'N/A'],
+   [d.detYear, l.year],
+   [d.detFloorD, l.floor===0?(lang==='es'?'Planta baja':'Ground floor'):l.floor],
+   [d.detParkD, l.parking||(lang==='es'?'No disponible':'N/A')]
+  ].forEach(function(pair){
+    var el = document.createElement('div'); el.className = 'extra-item';
+    el.innerHTML = '<div class="extra-lbl">'+pair[0]+'</div><div class="extra-val">'+pair[1]+'</div>';
+    ex.appendChild(el);
+  });
+  document.getElementById('det-agent-role').textContent = d.detAgentRole;
+  document.getElementById('det-wa').textContent = d.detWa;
+  document.getElementById('det-call').textContent = d.detCall;
+  document.getElementById('det-email').textContent = d.detEmail;
+  document.getElementById('det-map-lbl').textContent = d.detMapLbl;
+  document.getElementById('det-map-addr').textContent = '📍 ' + l.loc;
   goTo('detail');
 }
 
-function buildAmenities(){
-  const grid=document.getElementById('amenities-grid');grid.innerHTML='';
-  amenitiesData.forEach(a=>{
-    const el=document.createElement('div');el.className='amenity';el.dataset.id=a.id;
-    el.innerHTML=`<span class="am-ico2">${a.ico}</span><span class="lbl">${a[lang]}</span><span class="chk"></span>`;
-    el.onclick=function(){this.classList.toggle('on');this.querySelector('.chk').textContent=this.classList.contains('on')?'✓':'';updateProgress();};
+function buildAmenities() {
+  var grid = document.getElementById('amenities-grid'); grid.innerHTML = '';
+  amenData.forEach(function(a){
+    var el = document.createElement('div'); el.className = 'amenity'; el.dataset.id = a.id;
+    el.innerHTML = '<span class="lbl">' + a[lang] + '</span><span class="chk"></span>';
+    el.onclick = function(){
+      this.classList.toggle('on');
+      this.querySelector('.chk').textContent = this.classList.contains('on') ? '✓' : '';
+      updateProgress();
+    };
     grid.appendChild(el);
   });
 }
 
-function updateProgress(){
-  const fields=['f-title','f-city','f-sqm','f-price','f-cname','f-cphone'];
-  const filled=fields.filter(id=>{const e=document.getElementById(id);return e&&e.value.trim()!=='';}).length;
-  document.getElementById('prog').style.width=Math.round((filled/fields.length)*100)+'%';
+function updateProgress() {
+  var fields = ['f-title','f-city','f-sqm','f-price','f-cname','f-cphone'];
+  var filled = fields.filter(function(id){ var e=document.getElementById(id); return e&&e.value.trim()!==''; }).length;
+  document.getElementById('prog').style.width = Math.round((filled/fields.length)*100) + '%';
 }
 
-function apply(l){
-  lang=l;const d=T[l];
-  const set=(id,val,html)=>{const e=document.getElementById(id);if(e){html?e.innerHTML=val:e.textContent=val;}};
-  const ph=(id,val)=>{const e=document.getElementById(id);if(e)e.placeholder=val;};
-  set('nav-buy',d.navBuy);set('nav-rent',d.navRent);set('nav-agents',d.navAgents);set('nav-list',d.navList);
-  set('mm-buy',d.navBuy);set('mm-rent',d.navRent);set('mm-agents',d.navAgents);set('mm-list',d.navList);
-  set('mm-signin',d.signin);set('mm-post',d.post);
-  set('hero-badge',d.heroBadge);set('hero-title',d.heroTitle,true);set('hero-sub',d.heroSub);
+function apply(l) {
+  lang = l;
+  var d = T[l];
+  function set(id,val,html){ var e=document.getElementById(id); if(e){ if(html) e.innerHTML=val; else e.textContent=val; } }
+  function ph(id,val){ var e=document.getElementById(id); if(e) e.placeholder=val; }
+  set('nav-buy',d.navBuy); set('nav-rent',d.navRent); set('nav-map',d.navMapLbl); set('nav-list',d.navList);
+  set('mm-buy',d.navBuy); set('mm-rent',d.navRent); set('mm-map',d.navMapLbl); set('mm-list',d.navList);
+  set('mm-signin',d.signin); set('mm-post',d.post);
+  set('hero-badge',d.heroBadge); set('hero-title',d.heroTitle,true); set('hero-sub',d.heroSub);
   ph('inp-loc',d.inpLoc);
-  set('tab-buy',d.tabBuy);set('tab-rent',d.tabRent);set('tab-sell',d.tabSell);
-  set('opt-type',d.optType);set('opt-apt',d.optApt);set('opt-house',d.optHouse);set('opt-studio',d.optStudio);set('opt-pent',d.optPent);
-  set('opt-beds',d.optBeds);set('opt-price',d.optPrice);set('opt-p1',d.optP1);set('opt-p2',d.optP2);set('opt-p3',d.optP3);set('opt-p4',d.optP4);
-  set('btn-search',d.search);
-  set('stat1',d.stat1);set('stat2',d.stat2);set('stat3',d.stat3);set('stat4',d.stat4);
-  set('sec-feat',d.secFeat);set('lnk-all',d.lnkAll);
-  set('how-title',d.howTitle);set('how-sub',d.howSub);
-  set('s1',d.s1);set('s1d',d.s1d);set('s2',d.s2);set('s2d',d.s2d);set('s3',d.s3);set('s3d',d.s3d);set('s4',d.s4);set('s4d',d.s4d);
-  set('sec-cities',d.secCities);set('city-more',d.cityMore);set('city-more-sub',d.cityMoreSub);
-  document.querySelectorAll('.city-lbl').forEach(el=>el.textContent=d.cityLbl);
-  set('cta-title',d.ctaTitle);set('cta-sub',d.ctaSub);set('cta-btn',d.ctaBtn);
-  set('btn-signin',d.signin);set('btn-post',d.post);
-  set('ft-about',d.ftAbout);set('ft-contact',d.ftContact);set('ft-privacy',d.ftPrivacy);set('ft-terms',d.ftTerms);set('ft-copy',d.ftCopy);
-  set('ph-title',d.phTitle);set('ph-sub',d.phSub);
-  set('fs1',d.fs1);set('fs2',d.fs2);set('fs3',d.fs3);set('fs4',d.fs4);set('fs5',d.fs5);set('fs6',d.fs6);set('fs7',d.fs7);
-  set('l-optype',d.lOptype);set('l-proptype',d.lProptype);set('o-sale',d.oSale);set('o-rent',d.oRent);
-  set('o-apt',d.oApt);set('o-house',d.oHouse);set('o-studio',d.oStudio);set('o-pent',d.oPent);set('o-land',d.oLand);set('o-office',d.oOffice);
-  set('l-ftitle',d.lFtitle);set('l-desc',d.lDesc);set('l-state',d.lState);set('l-city',d.lCity);set('l-zone',d.lZone);
-  set('l-addr',d.lAddr);set('l-addr-hint',d.lAddrHint);set('l-beds',d.lBeds);set('l-baths',d.lBaths);set('l-sqm',d.lSqm);
-  set('l-floor',d.lFloor);set('l-elevators',d.lElevators);set('o-none',d.oNone);set('l-parking',d.lParking);set('o-nopark',d.oNopark);
-  set('l-condo',d.lCondo);set('l-condo-hint',d.lCondoHint);set('l-year',d.lYear);set('l-price',d.lPrice);set('l-negot',d.lNegot);
-  set('o-no',d.oNo);set('o-yes',d.oYes);set('up-main',d.upMain);set('up-browse',d.upBrowse);set('up-hint',d.upHint);
-  set('l-cname',d.lCname);set('l-cphone',d.lCphone);set('l-cemail',d.lCemail);set('l-crole',d.lCrole);
-  set('o-owner',d.oOwner);set('o-agent',d.oAgent);set('o-builder',d.oBuilder);set('btn-cancel',d.cancel);set('btn-submit',d.submit);
-  document.querySelectorAll('.amenity').forEach(el=>{const a=amenitiesData.find(x=>x.id===el.dataset.id);if(a)el.querySelector('.lbl').textContent=a[l];});
+  set('tab-buy',d.tabBuy); set('tab-rent',d.tabRent); set('tab-sell',d.tabSell);
+  set('opt-type',d.optType); set('opt-apt',d.optApt); set('opt-house',d.optHouse); set('opt-studio',d.optStudio); set('opt-pent',d.optPent);
+  set('opt-beds',d.optBeds); set('opt-price',d.optPrice); set('opt-p1',d.optP1); set('opt-p2',d.optP2); set('opt-p3',d.optP3); set('opt-p4',d.optP4);
+  set('btn-search-home',d.search);
+  set('stat1',d.stat1); set('stat2',d.stat2); set('stat3',d.stat3); set('stat4',d.stat4);
+  set('sec-feat',d.secFeat); set('lnk-all',d.lnkAll);
+  set('how-title',d.howTitle); set('how-sub',d.howSub);
+  set('s1',d.s1); set('s1d',d.s1d); set('s2',d.s2); set('s2d',d.s2d); set('s3',d.s3); set('s3d',d.s3d); set('s4',d.s4); set('s4d',d.s4d);
+  set('sec-cities',d.secCities); set('city-more',d.cityMore); set('city-more-sub',d.cityMoreSub);
+  document.querySelectorAll('.city-lbl').forEach(function(el){ el.textContent = d.cityLbl; });
+  set('cta-title',d.ctaTitle); set('cta-sub',d.ctaSub); set('cta-btn',d.ctaBtn);
+  set('btn-signin',d.signin); set('btn-post',d.post);
+  set('ft-about',d.ftAbout); set('ft-contact',d.ftContact); set('ft-privacy',d.ftPrivacy); set('ft-terms',d.ftTerms); set('ft-copy',d.ftCopy);
+  ph('map-loc',d.mapLocPh);
+  set('mvt-list-lbl',d.mvtList); set('mvt-map-lbl',d.mvtMap);
+  set('mob-toggle', mobShowMap ? d.mobToggleList : d.mobToggleMap);
+  set('ph-title',d.phTitle); set('ph-sub',d.phSub);
+  set('fs1',d.fs1); set('fs2',d.fs2); set('fs3',d.fs3); set('fs4',d.fs4); set('fs5',d.fs5); set('fs6',d.fs6); set('fs7',d.fs7);
+  set('l-optype',d.lOptype); set('l-proptype',d.lProptype); set('o-sale',d.oSale); set('o-rent',d.oRent);
+  set('o-apt',d.oApt); set('o-house',d.oHouse); set('o-studio',d.oStudio); set('o-pent',d.oPent); set('o-land',d.oLand); set('o-office',d.oOffice);
+  set('l-ftitle',d.lFtitle); set('l-desc',d.lDesc); set('l-state',d.lState); set('l-city',d.lCity); set('l-zone',d.lZone);
+  set('l-addr',d.lAddr); set('l-addr-hint',d.lAddrHint); set('l-beds',d.lBeds); set('l-baths',d.lBaths); set('l-sqm',d.lSqm);
+  set('l-floor',d.lFloor); set('l-elevators',d.lElevators); set('o-none',d.oNone); set('l-parking',d.lParking); set('o-nopark',d.oNopark);
+  set('l-condo',d.lCondo); set('l-condo-hint',d.lCondoHint); set('l-year',d.lYear); set('l-price',d.lPrice); set('l-negot',d.lNegot);
+  set('o-no',d.oNo); set('o-yes',d.oYes); set('up-main',d.upMain); set('up-browse',d.upBrowse); set('up-hint',d.upHint);
+  set('l-cname',d.lCname); set('l-cphone',d.lCphone); set('l-cemail',d.lCemail); set('l-crole',d.lCrole);
+  set('o-owner',d.oOwner); set('o-agent',d.oAgent); set('o-builder',d.oBuilder); set('btn-cancel',d.cancel); set('btn-submit',d.submit);
+  document.querySelectorAll('.amenity').forEach(function(el){
+    var a = amenData.filter(function(x){return x.id===el.dataset.id;})[0];
+    if(a) el.querySelector('.lbl').textContent = a[l];
+  });
+  if (leafMap) applyMapFilters();
   renderCards();
 }
 
-document.getElementById('lang-en').onclick=()=>{document.getElementById('lang-en').classList.add('active');document.getElementById('lang-es').classList.remove('active');apply('en');};
-document.getElementById('lang-es').onclick=()=>{document.getElementById('lang-es').classList.add('active');document.getElementById('lang-en').classList.remove('active');apply('es');};
-document.querySelectorAll('.stab').forEach(b=>{b.onclick=function(){document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));this.classList.add('active');};});
-document.querySelectorAll('.ptype').forEach(b=>{b.onclick=function(){document.querySelectorAll('.ptype').forEach(x=>x.classList.remove('on'));this.classList.add('on');};});
-document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',updateProgress));
+document.getElementById('lang-en').onclick = function(){
+  document.getElementById('lang-en').classList.add('active');
+  document.getElementById('lang-es').classList.remove('active');
+  apply('en');
+};
+document.getElementById('lang-es').onclick = function(){
+  document.getElementById('lang-es').classList.add('active');
+  document.getElementById('lang-en').classList.remove('active');
+  apply('es');
+};
+document.querySelectorAll('.stab').forEach(function(b){
+  b.onclick = function(){ document.querySelectorAll('.stab').forEach(function(x){x.classList.remove('active');}); this.classList.add('active'); };
+});
+document.querySelectorAll('.ptype').forEach(function(b){
+  b.onclick = function(){ document.querySelectorAll('.ptype').forEach(function(x){x.classList.remove('on');}); this.classList.add('on'); };
+});
+document.querySelectorAll('input,select,textarea').forEach(function(el){ el.addEventListener('input', updateProgress); });
 
 buildAmenities();
 apply('es');
 </script>
-
 </body>
 </html>
